@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>许我耀眼 - 在线视频播放</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="logo.jpg" alt="腾讯视频" class="logo-img">
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item">首页</a>
+                    <a href="#" class="nav-item">VIP会员</a>
+                    <a href="#" class="nav-item active">电视剧</a>
+                    <a href="#" class="nav-item">电影</a>
+                    <a href="#" class="nav-item">综艺</a>
+                    <a href="#" class="nav-item">动漫</a>
+                    <a href="#" class="nav-item">少儿</a>
+                    <a href="#" class="nav-item">全部</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索视频" class="search-input">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="header-icons">
+                    <span class="header-icon">游戏</span>
+                    <span class="header-icon">我的游戏</span>
+                    <span class="header-icon">历史</span>
+                    <span class="header-icon">消息</span>
+                    <span class="header-icon">应用</span>
+                </div>
+                <button class="vip-btn">V会员专区</button>
+                <button class="download-btn">下载客户端</button>
+                <div class="user-avatar">👤</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 左侧视频区域 -->
+        <div class="video-section">
+            <div class="video-title">
+                <h1>许我耀眼 第01集</h1>
+            </div>
+
+            <!-- 视频播放器 -->
+            <div class="video-container">
+                <video
+                    id="my-video"
+                    class="video-js vjs-big-play-centered"
+                    controls
+                    preload="auto"
+                    width="100%"
+                    height="100%"
+                    data-setup='{"fluid": true}'>
+                    <p class="vjs-no-js">
+                        请启用JavaScript来播放视频，或使用支持HTML5视频的浏览器。
+                    </p>
+                </video>
+                <div class="upload-hint" id="uploadHint">
+                    <p>📹 点击下方按钮选择本地视频文件</p>
+                    <input type="file" id="videoFileInput" accept="video/*" class="file-input">
+                    <label for="videoFileInput" class="upload-btn">选择视频文件</label>
+                </div>
+
+                <!-- 自定义播放控制栏 -->
+                <div class="custom-controls" id="customControls">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-played" id="progressPlayed"></div>
+                        </div>
+                        <div class="time-display">
+                            <span id="currentTime">02:44</span>
+                            <span id="totalTime">44:38</span>
+                        </div>
+                    </div>
+                    <div class="controls-bottom">
+                        <div class="controls-left">
+                            <button class="control-btn play-btn" id="playBtn">
+                                <span>▶</span>
+                            </button>
+                            <button class="control-btn next-btn">
+                                <span>⏭</span>
+                            </button>
+                            <button class="control-btn danmaku-switch-btn">
+                                <span>💬</span>
+                            </button>
+                            <button class="control-btn danmaku-settings-btn">
+                                <span>⚙💬</span>
+                            </button>
+                            <div class="danmaku-input-container">
+                                <input type="text" placeholder="发条弹幕，证明你的存在" class="danmaku-input">
+                                <button class="danmaku-send-btn">✏️</button>
+                            </div>
+                        </div>
+                        <div class="controls-right">
+                            <button class="control-btn svip-btn">升级SVIP</button>
+                            <button class="control-btn language-btn">语言</button>
+                            <button class="control-btn quality-btn">480P</button>
+                            <button class="control-btn speed-btn">倍速</button>
+                            <button class="control-btn volume-btn">
+                                <span>🔊</span>
+                            </button>
+                            <button class="control-btn settings-btn">
+                                <span>⚙️</span>
+                            </button>
+                            <button class="control-btn minimize-btn">
+                                <span>🗕</span>
+                            </button>
+                            <button class="control-btn fullscreen-btn" id="fullscreenBtn">
+                                <span>⛶</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户评价 -->
+            <div class="video-info">
+                <div class="user-reviews-horizontal">
+                    <div class="reviews-header">
+                        <h3>用户评价</h3>
+                    </div>
+                    <div class="reviews-container">
+                        <!-- 评论1 -->
+                        <div class="review-card">
+                            <div class="review-user">
+                                <div class="user-avatar">👤</div>
+                                <div class="user-name">QT蓝念</div>
+                            </div>
+                            <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                            <div class="review-tags">
+                                <span class="tag">强烈推荐</span>
+                            </div>
+                            <div class="review-keywords">
+                                <span class="keyword">演技好</span>
+                                <span class="keyword">女主力量</span>
+                                <span class="keyword">赵露思演技</span>
+                                <span class="keyword">服装美观</span>
+                                <span class="keyword">故事关头</span>
+                            </div>
+                            <p class="review-text">
+                                父母没有养好你的那个，还不如别让你生身父母打开以后，许朝是又丁大飞把妹学大的身不如大飞开不去是吧...
+                            </p>
+                            <div class="review-meta">累计观看超过2小时</div>
+                        </div>
+
+                        <!-- 评论2 -->
+                        <div class="review-card">
+                            <div class="review-user">
+                                <div class="user-avatar">👤</div>
+                                <div class="user-name">拜拜妮妮搭云与习</div>
+                            </div>
+                            <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                            <div class="review-tags">
+                                <span class="tag">强烈推荐</span>
+                            </div>
+                            <div class="review-keywords">
+                                <span class="keyword">路部高清</span>
+                                <span class="keyword">朝雾麻衣</span>
+                                <span class="keyword">晚市大不</span>
+                                <span class="keyword">女主力量</span>
+                                <span class="keyword">赵露思演技</span>
+                            </div>
+                            <p class="review-text">
+                                总说女主亥这是一个认真，总说得挺干不让追她者目白说人，只要玩儿工作时内再高强然，...
+                            </p>
+                            <div class="review-meta">累计观看少于1小时</div>
+                        </div>
+
+                        <!-- 评论3 -->
+                        <div class="review-card">
+                            <div class="review-user">
+                                <div class="user-avatar">👤</div>
+                                <div class="user-name">星</div>
+                            </div>
+                            <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                            <div class="review-tags">
+                                <span class="tag">强烈推荐</span>
+                            </div>
+                            <div class="review-keywords">
+                                <span class="keyword">有趣题</span>
+                                <span class="keyword">英语</span>
+                                <span class="keyword">特效炫妓</span>
+                                <span class="keyword">选片在线</span>
+                            </div>
+                            <p class="review-text">
+                                有《许我眼》时录当探好评讲好过，这让有信心上班都得一带着自己创应说，为它也...
+                            </p>
+                            <div class="review-meta">累计观看超过3小时</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 演员表 -->
+                <div class="cast-info">
+                    <h3>本剧演员</h3>
+                    <div class="cast-list">
+                        <div class="cast-item">
+                            <img src="赵露思.jpg" alt="赵露思" class="cast-avatar-img">
+                            <div class="cast-name">赵露思</div>
+                        </div>
+                        <div class="cast-item">
+                            <img src="陈伟霆.jpg" alt="陈伟霆" class="cast-avatar-img">
+                            <div class="cast-name">陈伟霆</div>
+                        </div>
+                        <div class="cast-item">
+                            <img src="万鹏.jpg" alt="万鹏" class="cast-avatar-img">
+                            <div class="cast-name">万鹏</div>
+                        </div>
+                        <div class="cast-item">
+                            <img src="唐晓天.jpg" alt="唐晓天" class="cast-avatar-img">
+                            <div class="cast-name">唐晓天</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧边栏 -->
+        <aside class="sidebar">
+            <!-- 剧集信息卡片 -->
+            <div class="series-card">
+                <div class="series-header">
+                    <img src="封面图.jpg" alt="剧集封面" class="series-poster">
+                    <div class="series-info">
+                        <h3 class="series-title">许我耀眼
+                            <span class="intro-link">简介 ›</span>
+                        </h3>
+                        <div class="series-meta">
+                            <span>🔥 17583</span> · <span>内地</span> · <span>2025</span> · <span>都市爱情</span>
+                        </div>
+                        <div class="series-actors">
+                            赵露思 陈伟霆 万鹏 唐晓天 管梓净
+                        </div>
+                        <div class="series-episodes">
+                            全32集
+                        </div>
+                    </div>
+                </div>
+                <div class="series-links">
+                    <a href="#" class="link-item">会员看全集</a>
+                    <a href="#" class="link-item">追剧日历 ›</a>
+                </div>
+                <div class="series-actions">
+                    <button class="action-btn">
+                        <span class="icon">≡+</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="icon">💬</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="icon">⬇</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="icon">⋯</span>
+                    </button>
+                </div>
+
+                <!-- VIP广告横幅 -->
+                <div class="vip-banner">
+                    <div class="vip-text">
+                        <div class="vip-title">JUMP卡特惠 年卡199元</div>
+                        <div class="vip-desc">享亲临现场等10大专属特权</div>
+                    </div>
+                    <button class="vip-open-btn">立即开通</button>
+                </div>
+            </div>
+
+            <!-- 选集面板 -->
+            <div class="episodes-panel">
+                <div class="panel-header">
+                    <div class="panel-tabs">
+                        <button class="tab-btn active">1-30</button>
+                        <button class="tab-btn">31-32</button>
+                    </div>
+                </div>
+                <div class="episodes-grid" id="episodesGrid">
+                    <!-- 通过JavaScript动态生成集数 -->
+                </div>
+            </div>
+
+        </aside>
+    </main>
+
+    <!-- 弹幕设置弹窗 -->
+    <div class="popup-overlay danmaku-settings-popup" id="danmakuSettingsPopup">
+        <div class="popup-content">
+            <h4>弹幕设置</h4>
+            <div class="setting-item">
+                <label>弹幕数量</label>
+                <input type="range" min="0" max="100" value="50" class="slider">
+            </div>
+            <div class="setting-item">
+                <label>字体大小</label>
+                <input type="range" min="0" max="100" value="50" class="slider">
+            </div>
+            <div class="setting-item">
+                <label>不透明度</label>
+                <input type="range" min="0" max="100" value="80" class="slider">
+            </div>
+            <div class="setting-item">
+                <label>弹幕速度</label>
+                <input type="range" min="0" max="100" value="50" class="slider">
+            </div>
+            <div class="setting-item">
+                <label>彩色弹幕</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 语言选择弹窗 -->
+    <div class="popup-overlay language-popup" id="languagePopup">
+        <div class="popup-content">
+            <h4>字幕设置 限免</h4>
+            <div class="subtitle-options">
+                <div class="subtitle-label">字幕语言</div>
+                <div class="subtitle-buttons">
+                    <button class="subtitle-btn active">默认</button>
+                    <button class="subtitle-btn">中文</button>
+                    <button class="subtitle-btn">无字幕</button>
+                </div>
+            </div>
+            <div class="subtitle-options">
+                <div class="subtitle-label">展示位置</div>
+                <div class="position-buttons">
+                    <button class="position-btn">
+                        <span class="icon">☐</span> 视频下方
+                    </button>
+                    <button class="position-btn">
+                        <span class="icon">☐</span> 视频上方
+                    </button>
+                </div>
+            </div>
+            <div class="setting-item">
+                <label>位置自适应</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label>字体大小</label>
+                <input type="range" min="0" max="100" value="50" class="slider">
+                <span class="size-label">默认</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 清晰度选择弹窗 -->
+    <div class="popup-overlay quality-popup" id="qualityPopup">
+        <div class="popup-content">
+            <div class="quality-option svip-quality">
+                <div class="quality-left">
+                    <span class="quality-icon">⚡</span>
+                    <span class="quality-name">臻彩MAX</span>
+                    <span class="quality-badge">最新支持</span>
+                </div>
+                <span class="svip-tag">SVIP尊享</span>
+            </div>
+            <div class="quality-option svip-quality">
+                <div class="quality-left">
+                    <span class="quality-name">4K 超高清 SDR</span>
+                </div>
+                <span class="svip-tag">SVIP尊享</span>
+            </div>
+            <div class="quality-option svip-quality">
+                <div class="quality-left">
+                    <span class="quality-icon">⚡</span>
+                    <span class="quality-name">臻彩1080P</span>
+                    <span class="quality-badge">高清 SDR 增强</span>
+                </div>
+                <span class="svip-tag">VIP尊享</span>
+            </div>
+            <div class="quality-option svip-quality">
+                <div class="quality-left">
+                    <span class="quality-name">1080P 高清 SDR</span>
+                </div>
+                <span class="svip-tag">SVIP尊享</span>
+            </div>
+            <div class="quality-option">
+                <div class="quality-left">
+                    <span class="quality-name">720P 准高清</span>
+                </div>
+            </div>
+            <div class="quality-option active">
+                <div class="quality-left">
+                    <span class="quality-name">480P 标清</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 倍速选择弹窗 -->
+    <div class="popup-overlay speed-popup" id="speedPopup">
+        <div class="popup-content">
+            <button class="speed-option">3.0X</button>
+            <button class="speed-option">2.0X</button>
+            <button class="speed-option">1.5X</button>
+            <button class="speed-option">1.25X</button>
+            <button class="speed-option active">1.0X</button>
+            <button class="speed-option">0.75X</button>
+            <button class="speed-option">0.5X</button>
+        </div>
+    </div>
+
+    <!-- 音量控制弹窗 -->
+    <div class="popup-overlay volume-popup" id="volumePopup">
+        <div class="popup-content">
+            <div class="volume-container">
+                <div class="volume-number">100</div>
+                <div class="volume-slider-container">
+                    <div class="volume-slider-track">
+                        <div class="volume-slider-fill" style="height: 100%"></div>
+                    </div>
+                    <input type="range" min="0" max="100" value="100" class="volume-slider" orient="vertical">
+                </div>
+                <button class="volume-icon-btn">🔊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="popup-overlay settings-popup" id="settingsPopup">
+        <div class="popup-content">
+            <div class="settings-item">
+                <span class="settings-label">自动连播</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">循环播放</span>
+                <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">自动跳过片头片尾</span>
+                <span class="info-icon">ⓘ</span>
+                <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="settings-item clickable">
+                <span class="settings-label">音效设置</span>
+                <span class="settings-value">默认音效 ›</span>
+            </div>
+            <div class="settings-item clickable">
+                <span class="settings-label">编码偏好</span>
+                <span class="settings-value">智能适配 ›</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video.js JS -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <!-- 自定义JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
