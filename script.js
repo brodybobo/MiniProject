@@ -26,7 +26,10 @@ function initVideoPlayer() {
         preload: 'auto',
         fluid: true,
         language: 'zh-CN',
-        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2]
+        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+        bigPlayButton: false, // 禁用大播放按钮
+        textTrackDisplay: false, // 禁用字幕显示
+        loadingSpinner: false // 禁用加载动画
     });
 
     // 播放器事件监听

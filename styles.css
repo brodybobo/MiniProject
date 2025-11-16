@@ -189,11 +189,22 @@ body {
 .video-js {
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
 
-/* 隐藏Video.js默认控制栏 */
-.video-js .vjs-control-bar {
-    display: none;
+/* 隐藏Video.js所有默认控制元素 */
+.video-js .vjs-control-bar,
+.video-js .vjs-big-play-button,
+.video-js .vjs-loading-spinner,
+.video-js .vjs-text-track-display {
+    display: none !important;
+}
+
+/* 确保video标签填充容器 */
+.video-js video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 /* 自定义播放控制栏 */
