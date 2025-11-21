@@ -438,6 +438,7 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
+<<<<<<< HEAD
 // ==================== AI朋友圈功能 ====================
 
 // AI朋友圈管理器实例
@@ -670,6 +671,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initAIMoments();
 });
 
+=======
+>>>>>>> a1c226af78f828695c8e6b0a5087d34eb2d870b8
 // 用户评价翻页功能
 const pagePrev = document.querySelector('.page-prev');
 const pageNext = document.querySelector('.page-next');
