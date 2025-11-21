@@ -3,6 +3,9 @@ let player;
 let currentEpisode = 1;
 const totalEpisodes = 32;
 
+// AI朋友圈管理器实例
+let aiMomentsManager = null;
+
 // 初始化页面
 document.addEventListener('DOMContentLoaded', function() {
     // 初始化视频播放器
@@ -16,7 +19,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化弹窗控制
     initPopupControls();
+    
+    // 初始化AI朋友圈
+    initAIMoments();
 });
+
+// 初始化AI朋友圈
+function initAIMoments() {
+    // 先加载AI数据文件
+    const dataScript = document.createElement('script');
+    dataScript.src = 'ai-moments-data.js';
+    dataScript.onload = function() {
+        console.log('AI数据加载成功');
+        
+        // 再加载AI朋友圈模块
+        const script = document.createElement('script');
+        script.src = 'ai-moments.js';
+        script.onload = function() {
+            if (typeof AIMomentsManager !== 'undefined') {
+                aiMomentsManager = new AIMomentsManager();
+                console.log('AI朋友圈模块加载成功');
+            }
+        };
+        script.onerror = function() {
+            console.error('AI朋友圈模块加载失败');
+        };
+        document.head.appendChild(script);
+    };
+    dataScript.onerror = function() {
+        console.error('AI数据加载失败，使用默认数据');
+        
+        // 即使数据加载失败，也继续加载模块
+        const script = document.createElement('script');
+        script.src = 'ai-moments.js';
+        script.onload = function() {
+            if (typeof AIMomentsManager !== 'undefined') {
+                aiMomentsManager = new AIMomentsManager();
+                console.log('AI朋友圈模块加载成功（使用默认数据）');
+            }
+        };
+        document.head.appendChild(script);
+    };
+    document.head.appendChild(dataScript);
+}
 
 // 初始化视频播放器
 function initVideoPlayer() {
@@ -438,238 +483,6 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-// ==================== AI朋友圈功能 ====================
-
-// AI朋友圈管理器实例
-let aiMomentsManager = null;
-
-// 初始化AI朋友圈
-function initAIMoments() {
-    // 先加载AI数据文件
-    const dataScript = document.createElement('script');
-    dataScript.src = 'ai-moments-data.js';
-    dataScript.onload = function() {
-        console.log('AI数据加载成功');
-        
-        // 再加载AI朋友圈模块
-        const script = document.createElement('script');
-        script.src = 'ai-moments.js';
-        script.onload = function() {
-            if (typeof AIMomentsManager !== 'undefined') {
-                aiMomentsManager = new AIMomentsManager();
-                console.log('AI朋友圈模块加载成功');
-                
-                // 初始化AI朋友圈事件监听
-                initAIMomentsEvents();
-            }
-        };
-        script.onerror = function() {
-            console.error('AI朋友圈模块加载失败');
-        };
-        document.head.appendChild(script);
-    };
-    dataScript.onerror = function() {
-        console.error('AI数据加载失败，使用默认数据');
-        
-        // 即使数据加载失败，也继续加载模块
-        const script = document.createElement('script');
-        script.src = 'ai-moments.js';
-        script.onload = function() {
-            if (typeof AIMomentsManager !== 'undefined') {
-                aiMomentsManager = new AIMomentsManager();
-                console.log('AI朋友圈模块加载成功（使用默认数据）');
-                
-                // 初始化AI朋友圈事件监听
-                initAIMomentsEvents();
-            }
-        };
-        document.head.appendChild(script);
-    };
-    document.head.appendChild(dataScript);
-}
-
-// 初始化AI朋友圈事件监听
-function initAIMomentsEvents() {
-    const aiMomentsBtn = document.getElementById('aiMomentsBtn');
-    const momentsCloseBtn = document.getElementById('momentsCloseBtn');
-    const aiMomentsSidebar = document.getElementById('aiMomentsSidebar');
-    const momentsPublishBtn = document.getElementById('momentsPublishBtn');
-    const publishModal = document.getElementById('publishModal');
-    const publishModalClose = document.getElementById('publishModalClose');
-    const publishCancelBtn = document.getElementById('publishCancelBtn');
-    const publishSubmitBtn = document.getElementById('publishSubmitBtn');
-    const publishTextarea = document.getElementById('publishTextarea');
-    const charCount = document.getElementById('charCount');
-
-    // 打开AI朋友圈侧边栏
-    if (aiMomentsBtn && aiMomentsSidebar) {
-        aiMomentsBtn.addEventListener('click', function() {
-            aiMomentsSidebar.classList.add('show');
-        });
-    }
-
-    // 关闭AI朋友圈侧边栏
-    if (momentsCloseBtn && aiMomentsSidebar) {
-        momentsCloseBtn.addEventListener('click', function() {
-            aiMomentsSidebar.classList.remove('show');
-        });
-    }
-
-    // 打开发布动态弹窗
-    if (momentsPublishBtn && publishModal) {
-        momentsPublishBtn.addEventListener('click', function() {
-            publishModal.classList.add('show');
-            publishTextarea.focus();
-        });
-    }
-
-    // 关闭发布动态弹窗
-    if (publishModalClose && publishModal) {
-        publishModalClose.addEventListener('click', function() {
-            publishModal.classList.remove('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
-        });
-    }
-
-    // 取消发布
-    if (publishCancelBtn && publishModal) {
-        publishCancelBtn.addEventListener('click', function() {
-            publishModal.classList.remove('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
-        });
-    }
-
-    // 字符计数
-    if (publishTextarea && charCount) {
-        publishTextarea.addEventListener('input', function() {
-            const length = this.value.length;
-            charCount.textContent = length;
-            publishSubmitBtn.disabled = length === 0 || length > 500;
-        });
-    }
-
-    // 提交动态
-    if (publishSubmitBtn && publishModal) {
-        publishSubmitBtn.addEventListener('click', function() {
-            const content = publishTextarea.value.trim();
-            if (content && content.length <= 500) {
-                if (aiMomentsManager) {
-                    aiMomentsManager.publishMoment(content);
-                }
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
-                
-                // 显示成功提示
-                showToast('动态发布成功！');
-            }
-        });
-    }
-
-    // 点击弹窗外部关闭
-    if (publishModal) {
-        publishModal.addEventListener('click', function(e) {
-            if (e.target === publishModal) {
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
-            }
-        });
-    }
-
-    // 键盘事件
-    document.addEventListener('keydown', function(e) {
-        // ESC键关闭弹窗
-        if (e.key === 'Escape') {
-            if (publishModal.classList.contains('show')) {
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
-            }
-            if (aiMomentsSidebar.classList.contains('show')) {
-                aiMomentsSidebar.classList.remove('show');
-            }
-        }
-    });
-}
-
-// 显示Toast提示
-function showToast(message, duration = 3000) {
-    // 移除已存在的Toast
-    const existingToast = document.querySelector('.toast-message');
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    // 创建新的Toast
-    const toast = document.createElement('div');
-    toast.className = 'toast-message';
-    toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #ff6b00;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        z-index: 10001;
-        animation: slideIn 0.3s ease-out;
-    `;
-
-    // 添加动画样式
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(toast);
-
-    // 自动隐藏
-    setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-in forwards';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.remove();
-            }
-        }, 300);
-    }, duration);
-}
-
-// 在页面加载时初始化AI朋友圈
-document.addEventListener('DOMContentLoaded', function() {
-    // 初始化视频播放器
-    initVideoPlayer();
-
-    // 生成集数列表
-    generateEpisodes();
-
-    // 设置文件上传监听
-    setupFileUpload();
-
-    // 初始化弹窗控制
-    initPopupControls();
-    
-    // 初始化AI朋友圈
-    initAIMoments();
-});
-
 // 用户评价翻页功能
 const pagePrev = document.querySelector('.page-prev');
 const pageNext = document.querySelector('.page-next');
@@ -893,4 +706,3 @@ function initPopupControls() {
         });
     }
 }
-
