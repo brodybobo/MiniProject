@@ -318,11 +318,16 @@ body {
     flex-shrink: 0;
 }
 
+.control-btn img {
+    height: 20px;
+    display: block;
+}
+
 .play-btn {
     padding: 6px 10px;
 }
 
-/* 开通SVIP按钮 - 官网样式 */
+/* 开通SVIP按钮 - 金色样式 */
 .svip-btn {
     background: linear-gradient(90deg, #ffa825, #ffcf4b);
     color: #2a1f00;
@@ -1394,8 +1399,9 @@ body {
 
 /* 倍速选择弹窗 */
 .speed-popup .popup-content {
-    padding: 8px;
-    min-width: 120px;
+    padding: 8px 0;
+    min-width: auto;
+    width: 60px;
 }
 
 .speed-option {
@@ -1403,21 +1409,20 @@ body {
     border: none;
     color: #fff;
     width: 100%;
-    padding: 12px;
+    padding: 10px 8px;
     text-align: center;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
     transition: background-color 0.2s;
 }
 
 .speed-option:hover {
-    background-color: #333;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .speed-option.active {
-    background-color: #444;
+    background-color: #4a4a4a;
 }
 
 /* 音量控制弹窗 */

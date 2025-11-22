@@ -72,19 +72,19 @@ class AIMomentsManager {
                 shen_haoming: {
                     id: 'shen_haoming',
                     name: '沈皓明',
-                    avatar: '陈伟霆.jpg',
+                    avatar: 'icon/陈伟霆.jpg',
                     personality: 'confident'
                 },
                 xu_yan: {
                     id: 'xu_yan',
                     name: '许妍',
-                    avatar: '赵露思.jpg',
+                    avatar: 'icon/赵露思.jpg',
                     personality: 'cheerful'
                 },
                 fang_lei: {
                     id: 'fang_lei',
                     name: '方蕾',
-                    avatar: '万鹏.jpg',
+                    avatar: 'icon/万鹏.jpg',
                     personality: 'calm'
                 }
             };
@@ -107,7 +107,7 @@ class AIMomentsManager {
                     id: 1001,
                     userId: 'xu_yan',
                     username: '许妍',
-                    avatar: '赵露思.jpg',
+                    avatar: 'icon/赵露思.jpg',
                     content: '今天的拍摄特别顺利！感谢所有工作人员的辛苦付出~',
                     timestamp: Date.now() - 2 * 60 * 60 * 1000,
                     likes: [],
@@ -117,7 +117,7 @@ class AIMomentsManager {
                     id: 1002,
                     userId: 'shen_haoming',
                     username: '沈皓明',
-                    avatar: '陈伟霆.jpg',
+                    avatar: 'icon/陈伟霆.jpg',
                     content: '工作再忙，也要记得照顾好自己。',
                     timestamp: Date.now() - 5 * 60 * 60 * 1000,
                     likes: [],
@@ -127,7 +127,7 @@ class AIMomentsManager {
                     id: 1003,
                     userId: 'fang_lei',
                     username: '方蕾',
-                    avatar: '万鹏.jpg',
+                    avatar: 'icon/万鹏.jpg',
                     content: '刚看完剧本，这个角色的成长弧线设计得真好。',
                     timestamp: Date.now() - 8 * 60 * 60 * 1000,
                     likes: [],
