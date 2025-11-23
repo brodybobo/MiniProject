@@ -2776,60 +2776,38 @@ body {
     background-color: rgba(93, 95, 239, 0.05);
 }
 
-/* 附加功能区域 */
-.publish-extras {
-    padding: 12px 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    display: flex;
-    gap: 16px;
-}
-
-.publish-extra-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--ai-icon-default);
-    font-size: 13px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.publish-extra-btn:hover {
-    background-color: rgba(93, 95, 239, 0.1);
-    color: var(--ai-primary);
-}
-
-.publish-extra-btn .icon {
-    font-size: 18px;
-}
-
-/* 可见范围选择 */
-.publish-visibility {
+/* 定位选择器 */
+.publish-location {
     padding: 12px 20px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.visibility-selector {
+.location-selector {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     cursor: pointer;
     padding: 8px 0;
+    transition: opacity 0.2s;
 }
 
-.visibility-label {
+.location-selector:hover {
+    opacity: 0.7;
+}
+
+.location-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.location-label {
     color: var(--ai-body-text);
     font-size: 14px;
+    flex: 1;
 }
 
-.visibility-value {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.location-arrow {
     color: var(--ai-secondary-text);
     font-size: 14px;
 }
