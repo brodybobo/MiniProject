@@ -378,13 +378,13 @@ body {
     padding: 6px 10px;
 }
 
-/* 开通SVIP按钮 - 金色样式 */
+/* 开通SVIP按钮 - 移除背景,只显示图片 */
 .svip-btn {
-    background: #ffe6a5;
+    background: transparent;
     color: #2a1f00;
     font-weight: 600;
-    padding: 6px 16px;
-    border-radius: 18px;
+    padding: 4px 6px;
+    border-radius: 0;
     font-size: 13px;
     border: none;
     cursor: pointer;
@@ -393,9 +393,14 @@ body {
 }
 
 .svip-btn:hover {
-    background: #ffedb8;
+    background: transparent;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255,168,37,0.4);
+    box-shadow: none;
+}
+
+.svip-btn img {
+    height: 27px;
+    display: block;
 }
 
 .danmaku-input-container {
