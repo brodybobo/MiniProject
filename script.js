@@ -772,7 +772,7 @@ function initAIMoments() {
                         </div>
                         <div class="moment-meta-row">
                             <span class="moment-time">${formatTime(moment.timestamp)}</span>
-                            ${isAI ? '<span class="official-badge">⭐ 官方推荐</span>' : ''}
+                            ${isAI ? '<span class="official-badge"><span class="star-icon">⭐</span> 官方推荐</span>' : ''}
                         </div>
                     </div>
                     ${isUser ? `

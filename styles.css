@@ -2138,8 +2138,12 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    color: var(--ai-accent);
+    color: var(--ai-secondary-text);
     font-size: 11px;
+}
+
+.official-badge .star-icon {
+    color: #fef8a1;
 }
 
 .moment-header-actions {
