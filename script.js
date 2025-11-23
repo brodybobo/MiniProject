@@ -181,11 +181,11 @@ function formatTime(seconds) {
 }
 
 // 生成集数列表
-function generateEpisodes() {
+function generateEpisodes(start = 1, end = 30) {
     const episodesGrid = document.getElementById('episodesGrid');
     episodesGrid.innerHTML = '';
 
-    for (let i = 1; i <= totalEpisodes; i++) {
+    for (let i = start; i <= end; i++) {
         const episodeItem = document.createElement('div');
         episodeItem.className = 'episode-item';
 
@@ -313,7 +313,15 @@ tabBtns.forEach(btn => {
         // 添加active类到当前按钮
         this.classList.add('active');
 
-        console.log('切换标签:', this.textContent);
+        const tabText = this.textContent.trim();
+        console.log('切换标签:', tabText);
+
+        // 根据标签切换集数显示范围
+        if (tabText === '1-30') {
+            generateEpisodes(1, 30);
+        } else if (tabText === '31-32') {
+            generateEpisodes(31, 32);
+        }
     });
 });
 

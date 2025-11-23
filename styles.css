@@ -157,11 +157,11 @@ body {
 }
 
 .vip-btn {
-    background: linear-gradient(90deg, #ff8a00, #ffd700);
+    background: #433c2b;
     border: none;
     padding: 8px 16px;
     border-radius: 20px;
-    color: #000;
+    color: #f9d583;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s;
@@ -379,7 +379,7 @@ body {
 
 /* 开通SVIP按钮 - 金色样式 */
 .svip-btn {
-    background: linear-gradient(90deg, #ffa825, #ffcf4b);
+    background: #ffe6a5;
     color: #2a1f00;
     font-weight: 600;
     padding: 6px 16px;
@@ -392,7 +392,7 @@ body {
 }
 
 .svip-btn:hover {
-    background: linear-gradient(90deg, #ffb534, #ffd65a);
+    background: #ffedb8;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255,168,37,0.4);
 }
@@ -683,13 +683,13 @@ body {
     justify-content: space-around;
     gap: 8px;
     margin-bottom: 12px;
-    padding: 12px 0;
+    padding: 1px 0;
 }
 
 .action-btn {
     background: transparent;
     border: none;
-    padding: 8px;
+    padding: 6px;
     color: #999;
     cursor: pointer;
     transition: color 0.2s;
@@ -703,15 +703,15 @@ body {
 }
 
 .action-btn svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
 }
 
 /* VIP横幅 */
 .vip-banner {
-    background: linear-gradient(90deg, #ffa825, #ffcf4b);
+    background: #ffe9ad;
     border-radius: 6px;
-    padding: 10px 12px;
+    padding: 8px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -726,20 +726,20 @@ body {
 }
 
 .vip-title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #2a1f00;
 }
 
 .vip-desc {
-    font-size: 11px;
+    font-size: 10px;
     color: #5a4a20;
 }
 
 .vip-open-btn {
     background: #8b5a00;
     border: none;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 4px;
     color: #fff;
     font-size: 12px;
@@ -845,7 +845,7 @@ body {
     position: absolute;
     top: 2px;
     right: 2px;
-    background: linear-gradient(135deg, #ffd700, #ff8a00);
+    background: #ffdf89;
     color: #000;
     font-size: 9px;
     font-weight: bold;
