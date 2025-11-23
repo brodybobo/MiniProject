@@ -60,7 +60,7 @@ app.get('/api/moments', (req, res) => {
 // 发布新动态
 app.post('/api/moments', async (req, res) => {
     try {
-        const { userId, username, avatar, content } = req.body;
+        const { userId, username, avatar, content, location, images } = req.body;
 
         // 验证必填字段
         if (!content || !content.trim()) {
@@ -84,6 +84,8 @@ app.post('/api/moments', async (req, res) => {
             username: username || '用户',
             avatar: avatar || '',
             content: content.trim(),
+            location: location || null,
+            images: images || [],
             timestamp: Date.now(),
             likes: [],
             comments: []

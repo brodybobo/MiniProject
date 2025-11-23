@@ -533,11 +533,14 @@ function initAIMoments() {
     const charCount = document.getElementById('charCount');
     const publishImagesPreview = document.getElementById('publishImagesPreview');
     const previewImagesGrid = document.getElementById('previewImagesGrid');
+    const locationSelector = document.querySelector('.location-selector');
+    const locationLabel = document.querySelector('.location-label');
 
     // API配置
     const API_BASE = 'http://localhost:3000/api';
     let moments = [];
     let selectedImages = []; // 存储选中的图片文件
+    let currentLocation = null; // 存储当前位置
     let autoRefreshInterval = null;
 
     // 打开AI朋友圈侧边栏
@@ -730,6 +733,9 @@ function initAIMoments() {
             // 清空图片
             selectedImages = [];
             renderImagePreviews();
+            // 重置位置
+            currentLocation = null;
+            locationLabel.textContent = '所在位置';
         });
     }
 
@@ -739,6 +745,9 @@ function initAIMoments() {
             // 清空图片
             selectedImages = [];
             renderImagePreviews();
+            // 重置位置
+            currentLocation = null;
+            locationLabel.textContent = '所在位置';
         });
     }
 
@@ -751,6 +760,122 @@ function initAIMoments() {
         });
     }
 
+    // 定位功能
+    if (locationSelector) {
+        locationSelector.addEventListener('click', async function() {
+            if (!navigator.geolocation) {
+                showToast('您的浏览器不支持定位服务');
+                return;
+            }
+
+            // 显示加载状态
+            const originalText = locationLabel.textContent;
+            locationLabel.textContent = '获取位置中...';
+
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
+                });
+
+                const { latitude, longitude } = position.coords;
+
+                // 使用高德地图逆地理编码API获取地址
+                const location = await getAddressFromCoords(latitude, longitude);
+
+                if (location) {
+                    currentLocation = {
+                        latitude,
+                        longitude,
+                        address: location
+                    };
+                    locationLabel.textContent = location;
+                } else {
+                    locationLabel.textContent = originalText;
+                    showToast('获取地址失败');
+                }
+            } catch (error) {
+                console.error('定位失败:', error);
+                locationLabel.textContent = originalText;
+
+                if (error.code === 1) {
+                    showToast('定位权限被拒绝');
+                } else if (error.code === 2) {
+                    showToast('无法获取位置信息');
+                } else if (error.code === 3) {
+                    showToast('定位超时');
+                } else {
+                    showToast('定位失败');
+                }
+            }
+        });
+    }
+
+    // 使用逆地理编码获取真实地址
+    async function getAddressFromCoords(lat, lon) {
+        try {
+            // 使用高德地图逆地理编码服务(国内速度快)
+            const key = 'f60efa9ed05f04861e34bda8609725b3'; // 高德地图API key
+
+            const response = await fetch(
+                `https://restapi.amap.com/v3/geocode/regeo?key=${key}&location=${lon},${lat}&poitype=&radius=1000&extensions=base&batch=false&roadlevel=0`,
+                {
+                    method: 'GET'
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('逆地理编码请求失败');
+            }
+
+            const data = await response.json();
+
+            if (data.status === '1' && data.regeocode) {
+                const addressComponent = data.regeocode.addressComponent;
+                let location = '';
+
+                // 优先显示：城市 + 区 + 街道/社区
+                if (addressComponent.city) {
+                    // 如果city是数组或者等于province,使用province
+                    if (Array.isArray(addressComponent.city) || addressComponent.city === addressComponent.province) {
+                        location = addressComponent.province || '';
+                    } else {
+                        location = addressComponent.city;
+                    }
+                }
+
+                if (addressComponent.district) {
+                    location += (location ? ' · ' : '') + addressComponent.district;
+                }
+
+                if (addressComponent.township || addressComponent.streetNumber?.street) {
+                    const place = addressComponent.township || addressComponent.streetNumber?.street;
+                    if (place && location.length < 30) { // 避免太长
+                        location += (location ? ' · ' : '') + place;
+                    }
+                }
+
+                // 如果没有获取到任何信息,使用formatted_address
+                if (!location && data.regeocode.formatted_address) {
+                    location = data.regeocode.formatted_address;
+                }
+
+                return location || null; // 返回null表示无法获取地址
+            }
+
+            // 如果高德API返回失败
+            return null;
+
+        } catch (error) {
+            console.error('获取地址失败:', error);
+            // 返回null表示获取失败
+            return null;
+        }
+    }
+
     // 发布动态
     if (publishSubmitBtn) {
         publishSubmitBtn.addEventListener('click', async function() {
@@ -759,16 +884,23 @@ function initAIMoments() {
 
             try {
                 console.log('📝 发布动态:', content);
+                const postData = {
+                    userId: 'user',
+                    username: '我',
+                    content: content
+                };
+
+                // 如果有位置信息，添加到发布数据中
+                if (currentLocation) {
+                    postData.location = currentLocation.address;
+                }
+
                 const response = await fetch(`${API_BASE}/moments`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        userId: 'user',
-                        username: '我',
-                        content: content
-                    })
+                    body: JSON.stringify(postData)
                 });
 
                 if (response.ok) {
@@ -776,6 +908,10 @@ function initAIMoments() {
                     publishModal.classList.remove('show');
                     showToast('发布成功！AI将在10-30秒内互动');
                     loadMoments();
+
+                    // 重置位置
+                    currentLocation = null;
+                    locationLabel.textContent = '所在位置';
                 } else {
                     console.error('❌ 发布失败，状态码:', response.status);
                     showToast('发布失败，请重试');
@@ -915,6 +1051,12 @@ function initAIMoments() {
                     ` : ''}
                 </div>
                 ${moment.content ? `<div class="moment-content">${moment.content}</div>` : ''}
+                ${moment.location ? `
+                    <div class="moment-location">
+                        <img src="icon/location.png" alt="位置" class="moment-location-icon" />
+                        <span class="moment-location-text">${moment.location}</span>
+                    </div>
+                ` : ''}
                 ${moment.images && moment.images.length > 0 ? `
                     <div class="moment-images moment-images-${moment.images.length}">
                         ${moment.images.map(img => `<img src="${img}" alt="" class="moment-image" />`).join('')}
