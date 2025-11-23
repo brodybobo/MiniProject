@@ -519,8 +519,6 @@ function initAIMoments() {
     const aiMomentsBtn = document.getElementById('aiMomentsBtn');
     const aiMomentsSidebar = document.getElementById('aiMomentsSidebar');
     const momentsCloseBtn = document.getElementById('momentsCloseBtn');
-    const momentsPublishBtn = document.getElementById('momentsPublishBtn');
-    const publishCardTrigger = document.getElementById('publishCardTrigger');
     const momentsRefreshBtn = document.getElementById('momentsRefreshBtn');
     const momentsCameraBtn = document.getElementById('momentsCameraBtn');
     const notificationBtn = document.getElementById('notificationBtn');
@@ -628,26 +626,6 @@ function initAIMoments() {
         });
     }
 
-    // 打开发布弹窗
-    if (momentsPublishBtn) {
-        momentsPublishBtn.addEventListener('click', function() {
-            publishModal.classList.add('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
-        });
-    }
-
-    // 发布入口卡片点击
-    if (publishCardTrigger) {
-        publishCardTrigger.addEventListener('click', function() {
-            publishModal.classList.add('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
-        });
-    }
-
     // 关闭发布弹窗
     if (publishModalClose) {
         publishModalClose.addEventListener('click', function() {
@@ -706,6 +684,37 @@ function initAIMoments() {
         });
     }
 
+    // 删除确认对话框事件监听
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+
+    // 取消删除
+    if (deleteCancelBtn) {
+        deleteCancelBtn.addEventListener('click', function() {
+            hideDeleteConfirm();
+        });
+    }
+
+    // 确认删除
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.addEventListener('click', async function() {
+            if (pendingDeleteMomentId) {
+                hideDeleteConfirm();
+                await deleteMoment(pendingDeleteMomentId);
+            }
+        });
+    }
+
+    // 点击对话框背景关闭
+    if (deleteConfirmModal) {
+        deleteConfirmModal.addEventListener('click', function(e) {
+            if (e.target === deleteConfirmModal) {
+                hideDeleteConfirm();
+            }
+        });
+    }
+
     // 加载动态列表
     async function loadMoments() {
         try {
@@ -735,10 +744,22 @@ function initAIMoments() {
                 ? moment.likes.map(l => l.username).join('、')
                 : '';
 
+            // AI明星头像映射
+            const aiAvatarMap = {
+                '许妍': 'icon/许妍头像.png',
+                '沈皓明': 'icon/沈皓明头像.png',
+                '方蕾': 'icon/方蕾头像logo.png'
+            };
+
             // 头像HTML
-            const avatarHtml = isUser
-                ? `<img src="icon/头像.png" alt="${moment.username}" class="moment-avatar" />`
-                : `<div class="moment-avatar moment-avatar-placeholder ${isAI ? 'ai-star' : ''}">${moment.username.charAt(0)}</div>`;
+            let avatarHtml;
+            if (isUser) {
+                avatarHtml = `<img src="icon/头像.png" alt="${moment.username}" class="moment-avatar" />`;
+            } else if (isAI && aiAvatarMap[moment.username]) {
+                avatarHtml = `<img src="${aiAvatarMap[moment.username]}" alt="${moment.username}" class="moment-avatar ai-star" />`;
+            } else {
+                avatarHtml = `<div class="moment-avatar moment-avatar-placeholder ${isAI ? 'ai-star' : ''}">${moment.username.charAt(0)}</div>`;
+            }
 
             return `
             <div class="moment-card" data-id="${moment.id}">
@@ -857,22 +878,9 @@ function initAIMoments() {
 
         // 删除按钮
         document.querySelectorAll('.moment-delete-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
+            btn.addEventListener('click', function() {
                 const momentId = this.dataset.id;
-                if (confirm('确定要删除这条动态吗？')) {
-                    try {
-                        const response = await fetch(`${API_BASE}/moments/${momentId}`, {
-                            method: 'DELETE'
-                        });
-                        if (response.ok) {
-                            showToast('删除成功');
-                            loadMoments();
-                        }
-                    } catch (error) {
-                        console.error('删除失败:', error);
-                        showToast('删除失败');
-                    }
-                }
+                showDeleteConfirm(momentId);
             });
         });
 
@@ -952,6 +960,65 @@ function initAIMoments() {
         } catch (error) {
             console.error('❌ 评论失败:', error);
             showToast('评论失败，请检查网络连接');
+        }
+    }
+
+    // 显示删除确认对话框
+    let pendingDeleteMomentId = null;
+
+    function showDeleteConfirm(momentId) {
+        pendingDeleteMomentId = momentId;
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        deleteModal.classList.add('show');
+    }
+
+    // 隐藏删除确认对话框
+    function hideDeleteConfirm() {
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        deleteModal.classList.remove('show');
+        pendingDeleteMomentId = null;
+    }
+
+    // 执行删除操作
+    async function deleteMoment(momentId) {
+        try {
+            // 先添加删除动画
+            const momentCard = document.querySelector(`[data-id="${momentId}"]`).closest('.moment-card');
+            if (momentCard) {
+                momentCard.classList.add('deleting');
+            }
+
+            // 延迟发送删除请求，让动画播放
+            setTimeout(async () => {
+                const response = await fetch(`${API_BASE}/moments/${momentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: 'user' })
+                });
+
+                if (response.ok) {
+                    // 删除成功后重新加载列表
+                    await loadMoments();
+                    showToast('删除成功');
+                } else {
+                    // 删除失败，移除动画类
+                    if (momentCard) {
+                        momentCard.classList.remove('deleting');
+                    }
+                    showToast('删除失败');
+                }
+            }, 150); // 等待一半动画时间再发送请求
+
+        } catch (error) {
+            console.error('❌ 删除失败:', error);
+            showToast('删除失败，请检查网络连接');
+            // 移除动画类
+            const momentCard = document.querySelector(`[data-id="${momentId}"]`).closest('.moment-card');
+            if (momentCard) {
+                momentCard.classList.remove('deleting');
+            }
         }
     }
 
@@ -1061,15 +1128,27 @@ function initAIMoments() {
             return;
         }
 
+        // AI明星头像映射
+        const aiAvatarMap = {
+            '许妍': 'icon/许妍头像.png',
+            '沈皓明': 'icon/沈皓明头像.png',
+            '方蕾': 'icon/方蕾头像logo.png'
+        };
+
         notificationsList.innerHTML = notifications.map(notif => {
             const isAI = notif.userId && notif.userId.startsWith('ai-');
             const actionText = notif.type === 'like' ? '赞了你' :
                               notif.type === 'comment' ? '评论了你' :
                               '回复了你';
 
+            // 头像HTML
+            const avatarHtml = aiAvatarMap[notif.user]
+                ? `<img src="${aiAvatarMap[notif.user]}" alt="${notif.user}" class="notification-avatar" />`
+                : `<div class="notification-avatar">${notif.user.charAt(0)}</div>`;
+
             return `
                 <div class="notification-item" data-moment-id="${notif.momentId}">
-                    <div class="notification-avatar">${notif.user.charAt(0)}</div>
+                    ${avatarHtml}
                     <div class="notification-content">
                         <div class="notification-user">${notif.user}</div>
                         <div class="notification-action">

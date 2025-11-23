@@ -1688,22 +1688,47 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    background-color: #fff;
+    padding: 12px 16px;
+    background-image: url('icon/AI朋友圈顶部背景.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    position: relative;
 }
 
 .moments-header-left {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1;
 }
 
-.moments-header h2 {
-    color: var(--ai-title-text);
+.moments-header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffffff;
     font-size: 18px;
     font-weight: 600;
     margin: 0;
+    white-space: nowrap;
+}
+
+.moments-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.moments-header h2 {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .moments-header-actions {
@@ -1792,7 +1817,7 @@ body {
 .moments-close-btn {
     background: none;
     border: none;
-    color: var(--ai-icon-default);
+    color: #ffffff;
     font-size: 20px;
     cursor: pointer;
     padding: 8px;
@@ -1806,8 +1831,8 @@ body {
 }
 
 .moments-close-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: var(--ai-title-text);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }
 
 /* 通知面板 */
@@ -1911,6 +1936,7 @@ body {
     font-size: 18px;
     font-weight: 600;
     flex-shrink: 0;
+    object-fit: cover;
 }
 
 .notification-content {
@@ -1986,76 +2012,6 @@ body {
 }
 
 /* 发布入口卡片 */
-.moments-publish-area {
-    padding: 12px 16px;
-}
-
-.moments-publish-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background-color: var(--ai-card-bg);
-    border-radius: 12px;
-    padding: 12px 16px;
-    box-shadow: var(--ai-card-shadow);
-}
-
-.publish-card-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.publish-card-input {
-    flex: 1;
-    color: var(--ai-secondary-text);
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.publish-card-btn {
-    background: var(--ai-primary-gradient);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 6px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.publish-card-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
-}
-
-/* 旧的发布按钮样式保留兼容 */
-.moments-publish-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--ai-primary-gradient);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: none; /* 隐藏旧按钮 */
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.moments-publish-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
-}
-
 /* 动态列表 */
 .moments-list {
     flex: 1;
@@ -2720,6 +2676,114 @@ body {
     background: #E5E7EB;
     color: var(--ai-secondary-text);
     cursor: not-allowed;
+}
+
+/* 删除确认对话框 */
+.delete-confirm-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 450px;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-confirm-modal.show {
+    display: flex;
+}
+
+.delete-confirm-content {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    width: 320px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+    animation: slideInFromBottom 0.3s ease-out;
+}
+
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.delete-confirm-message {
+    font-size: 16px;
+    color: var(--ai-title-text);
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.delete-confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.delete-cancel-btn,
+.delete-confirm-btn {
+    padding: 10px 32px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    flex: 1;
+}
+
+.delete-cancel-btn {
+    background-color: var(--ai-bg);
+    color: var(--ai-body-text);
+}
+
+.delete-cancel-btn:hover {
+    background-color: #E5E7EB;
+}
+
+.delete-confirm-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+}
+
+.delete-confirm-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* 删除动画 */
+.moment-card.deleting {
+    animation: slideOutAndFade 0.3s ease-out forwards;
+}
+
+@keyframes slideOutAndFade {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+        max-height: 1000px;
+        margin-bottom: 16px;
+    }
+    50% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-20px);
+        max-height: 0;
+        margin-bottom: 0;
+        padding: 0;
+    }
 }
 
 /* 操作菜单 */
