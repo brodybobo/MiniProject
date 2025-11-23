@@ -463,12 +463,6 @@ body {
     display: none;
 }
 
-.upload-hint p {
-    font-size: 18px;
-    margin-bottom: 20px;
-    color: #999;
-}
-
 .file-input {
     display: none;
 }
