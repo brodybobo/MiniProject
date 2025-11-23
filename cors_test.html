@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨域测试</title>
+</head>
+<body>
+    <h1>跨域API测试</h1>
+    <button onclick="testAPI()">测试API调用</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '正在测试...';
+            
+            try {
+                console.log('开始测试API调用...');
+                const response = await fetch('http://localhost:3000/api/moments');
+                console.log('响应状态:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('响应数据:', data);
+                    resultDiv.innerHTML = `
+                        <h3>✅ API调用成功</h3>
+                        <p>状态码: ${response.status}</p>
+                        <p>动态数量: ${data.data.length}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('API调用失败:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ API调用失败</h3>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+
+        // 页面加载时自动测试
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

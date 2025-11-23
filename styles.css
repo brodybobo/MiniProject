@@ -2327,6 +2327,30 @@ body {
     border-radius: 16px;
 }
 
+/* ==================== AI朋友圈 Toast 提示样式 ==================== */
+.ai-moments-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.ai-moments-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 
 
 

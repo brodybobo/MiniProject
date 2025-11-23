@@ -446,61 +446,16 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-// ==================== AI朋友圈功能 ====================
-
-// AI朋友圈管理器实例
-let aiMomentsManager = null;
+// ==================== AI朋友圈功能（后端API集成）====================
 
 // 初始化AI朋友圈
 function initAIMoments() {
-    // 先加载AI数据文件
-    const dataScript = document.createElement('script');
-    dataScript.src = 'ai-moments-data.js';
-    dataScript.onload = function() {
-        console.log('AI数据加载成功');
-        
-        // 再加载AI朋友圈模块
-        const script = document.createElement('script');
-        script.src = 'ai-moments.js';
-        script.onload = function() {
-            if (typeof AIMomentsManager !== 'undefined') {
-                aiMomentsManager = new AIMomentsManager();
-                console.log('AI朋友圈模块加载成功');
-                
-                // 初始化AI朋友圈事件监听
-                initAIMomentsEvents();
-            }
-        };
-        script.onerror = function() {
-            console.error('AI朋友圈模块加载失败');
-        };
-        document.head.appendChild(script);
-    };
-    dataScript.onerror = function() {
-        console.error('AI数据加载失败，使用默认数据');
-        
-        // 即使数据加载失败，也继续加载模块
-        const script = document.createElement('script');
-        script.src = 'ai-moments.js';
-        script.onload = function() {
-            if (typeof AIMomentsManager !== 'undefined') {
-                aiMomentsManager = new AIMomentsManager();
-                console.log('AI朋友圈模块加载成功（使用默认数据）');
-                
-                // 初始化AI朋友圈事件监听
-                initAIMomentsEvents();
-            }
-        };
-        document.head.appendChild(script);
-    };
-    document.head.appendChild(dataScript);
-}
+    console.log('初始化AI朋友圈功能...');
 
-// 初始化AI朋友圈事件监听
-function initAIMomentsEvents() {
+    // AI朋友圈功能已集成到页面中，通过后端API加载数据
     const aiMomentsBtn = document.getElementById('aiMomentsBtn');
-    const momentsCloseBtn = document.getElementById('momentsCloseBtn');
     const aiMomentsSidebar = document.getElementById('aiMomentsSidebar');
+    const momentsCloseBtn = document.getElementById('momentsCloseBtn');
     const momentsPublishBtn = document.getElementById('momentsPublishBtn');
     const publishModal = document.getElementById('publishModal');
     const publishModalClose = document.getElementById('publishModalClose');
@@ -509,103 +464,293 @@ function initAIMomentsEvents() {
     const publishTextarea = document.getElementById('publishTextarea');
     const charCount = document.getElementById('charCount');
 
+    // API配置
+    const API_BASE = 'http://localhost:3000/api';
+    let moments = [];
+    let autoRefreshInterval = null;
+
     // 打开AI朋友圈侧边栏
-    if (aiMomentsBtn && aiMomentsSidebar) {
+    if (aiMomentsBtn) {
         aiMomentsBtn.addEventListener('click', function() {
             aiMomentsSidebar.classList.add('show');
+            loadMoments();
+            startAutoRefresh();
         });
     }
 
     // 关闭AI朋友圈侧边栏
-    if (momentsCloseBtn && aiMomentsSidebar) {
+    if (momentsCloseBtn) {
         momentsCloseBtn.addEventListener('click', function() {
             aiMomentsSidebar.classList.remove('show');
+            stopAutoRefresh();
         });
     }
 
-    // 打开发布动态弹窗
-    if (momentsPublishBtn && publishModal) {
+    // 打开发布弹窗
+    if (momentsPublishBtn) {
         momentsPublishBtn.addEventListener('click', function() {
             publishModal.classList.add('show');
-            publishTextarea.focus();
+            publishTextarea.value = '';
+            charCount.textContent = '0';
+            publishSubmitBtn.disabled = true;
         });
     }
 
-    // 关闭发布动态弹窗
-    if (publishModalClose && publishModal) {
+    // 关闭发布弹窗
+    if (publishModalClose) {
         publishModalClose.addEventListener('click', function() {
             publishModal.classList.remove('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
         });
     }
 
-    // 取消发布
-    if (publishCancelBtn && publishModal) {
+    if (publishCancelBtn) {
         publishCancelBtn.addEventListener('click', function() {
             publishModal.classList.remove('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
         });
     }
 
-    // 字符计数
-    if (publishTextarea && charCount) {
+    // 文本输入监听
+    if (publishTextarea) {
         publishTextarea.addEventListener('input', function() {
             const length = this.value.length;
             charCount.textContent = length;
-            publishSubmitBtn.disabled = length === 0 || length > 500;
+            publishSubmitBtn.disabled = length === 0;
         });
     }
 
-    // 提交动态
-    if (publishSubmitBtn && publishModal) {
-        publishSubmitBtn.addEventListener('click', function() {
+    // 发布动态
+    if (publishSubmitBtn) {
+        publishSubmitBtn.addEventListener('click', async function() {
             const content = publishTextarea.value.trim();
-            if (content && content.length <= 500) {
-                if (aiMomentsManager) {
-                    aiMomentsManager.publishMoment(content);
+            if (!content) return;
+
+            try {
+                console.log('📝 发布动态:', content);
+                const response = await fetch(`${API_BASE}/moments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: 'user',
+                        username: '我',
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ 发布成功');
+                    publishModal.classList.remove('show');
+                    showToast('发布成功！AI将在10-30秒内互动');
+                    loadMoments();
+                } else {
+                    console.error('❌ 发布失败，状态码:', response.status);
+                    showToast('发布失败，请重试');
                 }
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
-                
-                // 显示成功提示
-                showToast('动态发布成功！');
+            } catch (error) {
+                console.error('❌ 发布失败:', error);
+                showToast('发布失败，请检查网络连接');
             }
         });
     }
 
-    // 点击弹窗外部关闭
-    if (publishModal) {
-        publishModal.addEventListener('click', function(e) {
-            if (e.target === publishModal) {
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
+    // 加载动态列表
+    async function loadMoments() {
+        try {
+            const response = await fetch(`${API_BASE}/moments`);
+            if (response.ok) {
+                const result = await response.json();
+                // 后端返回格式：{success: true, data: [...]}
+                moments = result.data || result;
+                console.log('✅ 加载动态成功，共', moments.length, '条');
+                renderMoments();
             }
-        });
-    }
-
-    // 键盘事件
-    document.addEventListener('keydown', function(e) {
-        // ESC键关闭弹窗
-        if (e.key === 'Escape') {
-            if (publishModal.classList.contains('show')) {
-                publishModal.classList.remove('show');
-                publishTextarea.value = '';
-                charCount.textContent = '0';
-                publishSubmitBtn.disabled = true;
-            }
-            if (aiMomentsSidebar.classList.contains('show')) {
-                aiMomentsSidebar.classList.remove('show');
-            }
+        } catch (error) {
+            console.error('❌ 加载动态失败:', error);
         }
-    });
+    }
+
+    // 渲染动态列表
+    function renderMoments() {
+        const momentsList = document.getElementById('momentsList');
+        if (!momentsList) return;
+
+        momentsList.innerHTML = moments.map(moment => `
+            <div class="moment-item" data-id="${moment.id}">
+                <div class="moment-header">
+                    <div class="moment-user">
+                        <div class="moment-avatar">${moment.username.charAt(0)}</div>
+                        <div class="moment-user-info">
+                            <div class="moment-username">${moment.username}</div>
+                            <div class="moment-time">${formatTime(moment.timestamp)}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="moment-content">${moment.content}</div>
+                <div class="moment-actions">
+                    <button class="moment-action-btn like-btn ${moment.likes && moment.likes.some(like => like.userId === 'user') ? 'liked' : ''}" data-id="${moment.id}">
+                        <span>👍</span>
+                        <span class="like-count">${moment.likes ? moment.likes.length : 0}</span>
+                    </button>
+                    <button class="moment-action-btn comment-btn" data-id="${moment.id}">
+                        <span>💬</span>
+                        <span class="comment-count">${moment.comments ? moment.comments.length : 0}</span>
+                    </button>
+                </div>
+                ${moment.comments && moment.comments.length > 0 ? `
+                    <div class="moment-comments">
+                        ${moment.comments.map(comment => `
+                            <div class="moment-comment">
+                                <span class="comment-user">${comment.username}</span>
+                                ${comment.replyTo ? `<span class="comment-reply">回复 ${comment.replyTo}</span>` : ''}
+                                <span class="comment-content">: ${comment.content}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                <div class="moment-comment-input" style="display: none;">
+                    <input type="text" class="comment-input" placeholder="说点什么..." data-id="${moment.id}">
+                    <button class="comment-send-btn" data-id="${moment.id}">发送</button>
+                </div>
+            </div>
+        `).join('');
+
+        // 绑定事件
+        bindMomentEvents();
+    }
+
+    // 绑定动态事件
+    function bindMomentEvents() {
+        // 点赞按钮
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const momentId = this.dataset.id;
+                await toggleLike(momentId);
+            });
+        });
+
+        // 评论按钮
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const momentId = this.dataset.id;
+                const momentItem = document.querySelector(`.moment-item[data-id="${momentId}"]`);
+                const commentInput = momentItem.querySelector('.moment-comment-input');
+                commentInput.style.display = commentInput.style.display === 'none' ? 'flex' : 'none';
+            });
+        });
+
+        // 发送评论按钮
+        document.querySelectorAll('.comment-send-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const momentId = this.dataset.id;
+                const momentItem = document.querySelector(`.moment-item[data-id="${momentId}"]`);
+                const input = momentItem.querySelector('.comment-input');
+                const content = input.value.trim();
+
+                if (content) {
+                    await submitComment(momentId, content);
+                    input.value = '';
+                }
+            });
+        });
+
+        // 评论输入框回车发送
+        document.querySelectorAll('.comment-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const btn = this.parentElement.querySelector('.comment-send-btn');
+                    btn.click();
+                }
+            });
+        });
+    }
+
+    // 切换点赞
+    async function toggleLike(momentId) {
+        try {
+            const response = await fetch(`${API_BASE}/moments/${momentId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: 'user',
+                    username: '我'
+                })
+            });
+
+            if (response.ok) {
+                loadMoments();
+            }
+        } catch (error) {
+            console.error('点赞失败:', error);
+        }
+    }
+
+    // 提交评论
+    async function submitComment(momentId, content) {
+        try {
+            console.log('📝 提交评论到动态', momentId, ':', content);
+            const response = await fetch(`${API_BASE}/moments/${momentId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: 'user',
+                    username: '我',
+                    content: content
+                })
+            });
+
+            if (response.ok) {
+                console.log('✅ 评论成功');
+                showToast('评论成功！AI将在3-8秒内回复');
+                loadMoments();
+            } else {
+                console.error('❌ 评论失败，状态码:', response.status);
+                showToast('评论失败，请重试');
+            }
+        } catch (error) {
+            console.error('❌ 评论失败:', error);
+            showToast('评论失败，请检查网络连接');
+        }
+    }
+
+    // 格式化时间
+    function formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return '刚刚';
+        if (minutes < 60) return `${minutes}分钟前`;
+        if (hours < 24) return `${hours}小时前`;
+        if (days < 7) return `${days}天前`;
+
+        const date = new Date(timestamp);
+        return `${date.getMonth() + 1}-${date.getDate()}`;
+    }
+
+    // 开始自动刷新
+    function startAutoRefresh() {
+        if (autoRefreshInterval) return;
+        autoRefreshInterval = setInterval(() => {
+            loadMoments();
+        }, 5000); // 每5秒刷新一次
+    }
+
+    // 停止自动刷新
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+    }
+
+    console.log('AI朋友圈功能初始化完成');
 }
 
 // 显示Toast提示
