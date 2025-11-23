@@ -29,7 +29,11 @@ function initVideoPlayer() {
         playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
         bigPlayButton: false, // 禁用大播放按钮
         textTrackDisplay: false, // 禁用字幕显示
-        loadingSpinner: false // 禁用加载动画
+        loadingSpinner: false, // 禁用加载动画
+        userActions: {
+            hotkeys: true,
+            click: true // 启用点击控制
+        }
     });
 
     // 播放器事件监听
@@ -65,6 +69,38 @@ function initVideoPlayer() {
         console.error('播放器错误:', e);
     });
 
+    // 添加点击视频播放/暂停功能
+    player.on('ready', function() {
+        console.log('播放器准备就绪');
+
+        // 只使用一个监听器，在最底层的video元素上监听，并阻止冒泡
+        const videoEl = document.querySelector('#my-video_html5_api');
+        if (videoEl) {
+            console.log('找到video元素，添加点击监听');
+            videoEl.addEventListener('click', function(e) {
+                console.log('=== Video被点击 ===');
+
+                // 阻止事件冒泡，防止触发多次
+                e.stopPropagation();
+
+                // 排除点击控制栏的情况
+                if (e.target.closest('.custom-controls')) {
+                    console.log('点击的是控制栏，忽略');
+                    return;
+                }
+
+                // 切换播放/暂停
+                if (player.paused()) {
+                    console.log('点击播放');
+                    player.play();
+                } else {
+                    console.log('点击暂停');
+                    player.pause();
+                }
+            }, true); // 使用捕获阶段，确保最先执行
+        }
+    });
+
     // 初始化自定义控制栏
     initCustomControls();
 }
@@ -77,15 +113,42 @@ function initCustomControls() {
     const progressBar = document.querySelector('.progress-bar');
     const nextBtn = document.querySelector('.next-btn');
 
+    console.log('初始化自定义控制栏');
+    console.log('playBtn:', playBtn);
+    console.log('player对象:', player);
+
     // 播放/暂停按钮
     if (playBtn) {
-        playBtn.addEventListener('click', function() {
+        // 移除可能存在的旧监听器，添加新的
+        const newPlayBtn = playBtn.cloneNode(true);
+        playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+
+        newPlayBtn.addEventListener('click', function(e) {
+            console.log('播放按钮被点击！');
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!player) {
+                console.error('Player对象不存在！');
+                return;
+            }
+
             if (player.paused()) {
-                player.play();
+                console.log('当前暂停，准备播放');
+                player.play().then(() => {
+                    console.log('播放成功');
+                }).catch(err => {
+                    console.error('播放失败:', err);
+                });
             } else {
+                console.log('当前播放中，准备暂停');
                 player.pause();
+                console.log('暂停成功');
             }
         });
+        console.log('播放按钮事件监听已添加');
+    } else {
+        console.error('找不到播放按钮元素！');
     }
 
     // 全屏按钮
@@ -807,9 +870,6 @@ function showToast(message, duration = 3000) {
 
 // 在页面加载时初始化AI朋友圈
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化视频播放器
-    initVideoPlayer();
-
     // 生成集数列表
     generateEpisodes();
 
