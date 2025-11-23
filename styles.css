@@ -1632,6 +1632,21 @@ body {
 
 /* ==================== AI朋友圈样式 ==================== */
 
+/* 主题变量 */
+:root {
+    --ai-primary: #5D5FEF;
+    --ai-primary-gradient: linear-gradient(135deg, #5D5FEF 0%, #9B6BFF 100%);
+    --ai-accent: #FF9D73;
+    --ai-bg: #F5F6FA;
+    --ai-card-bg: #FFFFFF;
+    --ai-title-text: #111827;
+    --ai-body-text: #374151;
+    --ai-secondary-text: #9CA3AF;
+    --ai-icon-default: #6B7280;
+    --ai-like-highlight: #FF5A79;
+    --ai-card-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
 /* AI朋友圈按钮 */
 .ai-moments-btn {
     background-color: #000000;
@@ -1639,23 +1654,24 @@ body {
 }
 
 .ai-moments-btn img {
-    height: 24px;  /* 放大图标 */
+    height: 24px;
 }
 
 .ai-moments-btn:hover {
     background-color: rgba(0, 0, 0, 0.8);
     border-color: #ffe6a5;
+    transform: scale(1.05);
 }
 
 /* AI朋友圈侧边栏 */
 .ai-moments-sidebar {
     position: fixed;
     top: 0;
-    right: -400px;
-    width: 400px;
+    right: -420px;
+    width: 420px;
     height: 100vh;
-    background-color: #1a1a1a;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+    background-color: var(--ai-bg);
+    box-shadow: -4px 0 20px rgba(15, 23, 42, 0.15);
     z-index: 10000;
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -1672,73 +1688,156 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    background-color: #222;
-    border-bottom: 1px solid #333;
+    padding: 16px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.moments-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .moments-header h2 {
-    color: #fff;
-    font-size: 20px;
+    color: var(--ai-title-text);
+    font-size: 18px;
     font-weight: 600;
     margin: 0;
+}
+
+.moments-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.moments-header-btn {
+    background: none;
+    border: none;
+    color: var(--ai-icon-default);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.moments-header-btn:hover {
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--ai-primary);
+}
+
+.moments-header-btn.camera-btn {
+    color: var(--ai-primary);
 }
 
 .moments-close-btn {
     background: none;
     border: none;
-    color: #999;
-    font-size: 24px;
+    color: var(--ai-icon-default);
+    font-size: 20px;
     cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.2s;
 }
 
 .moments-close-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--ai-title-text);
 }
 
-/* 发布区域 */
+/* 发布入口卡片 */
 .moments-publish-area {
-    padding: 15px 20px;
-    border-bottom: 1px solid #333;
+    padding: 12px 16px;
 }
 
+.moments-publish-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--ai-card-bg);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: var(--ai-card-shadow);
+}
+
+.publish-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ai-primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.publish-card-input {
+    flex: 1;
+    color: var(--ai-secondary-text);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.publish-card-btn {
+    background: var(--ai-primary-gradient);
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.publish-card-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
+}
+
+/* 旧的发布按钮样式保留兼容 */
 .moments-publish-btn {
     width: 100%;
     padding: 12px;
-    background-color: #ff6b00;
+    background: var(--ai-primary-gradient);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
+    display: none; /* 隐藏旧按钮 */
     align-items: center;
     justify-content: center;
     gap: 8px;
 }
 
 .moments-publish-btn:hover {
-    background-color: #ff8533;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
 }
 
 /* 动态列表 */
 .moments-list {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 12px 16px;
 }
 
 .moments-list::-webkit-scrollbar {
@@ -1746,116 +1845,173 @@ body {
 }
 
 .moments-list::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: transparent;
 }
 
 .moments-list::-webkit-scrollbar-thumb {
-    background: #444;
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
 }
 
 .moments-list::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: rgba(0, 0, 0, 0.25);
 }
 
 /* 动态卡片 */
 .moment-card {
-    background-color: #222;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
+    background-color: var(--ai-card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--ai-card-shadow);
     transition: all 0.2s;
 }
 
 .moment-card:hover {
-    background-color: #252525;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
 }
 
 .moment-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 12px;
 }
 
 .moment-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 12px;
-    background-color: #333;
+    background-color: #f0f0f0;
+    flex-shrink: 0;
 }
 
 .moment-avatar-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--ai-primary-gradient);
     color: #fff;
     font-size: 18px;
     font-weight: 600;
     flex-shrink: 0;
 }
 
+/* AI明星头像特殊样式 */
+.moment-avatar.ai-star {
+    border: 2px solid transparent;
+    background: linear-gradient(#fff, #fff) padding-box,
+                var(--ai-primary-gradient) border-box;
+}
+
 .moment-user-info {
     flex: 1;
+    min-width: 0;
+}
+
+.moment-user-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
 .moment-username {
-    color: #fff;
+    color: var(--ai-primary);
     font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.moment-user-id {
+    color: var(--ai-secondary-text);
+    font-size: 12px;
+}
+
+/* AI明星标签 */
+.ai-star-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--ai-primary-gradient);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 8px;
     font-weight: 500;
-    margin-bottom: 4px;
+}
+
+.moment-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 .moment-time {
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 12px;
+}
+
+/* 官方推荐标签 */
+.official-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--ai-accent);
+    font-size: 11px;
 }
 
 .moment-header-actions {
     display: flex;
     align-items: center;
     gap: 4px;
+    margin-left: auto;
 }
 
 .moment-delete-btn {
     background: none;
     border: none;
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 16px;
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: all 0.2s;
+    opacity: 0;
+}
+
+.moment-card:hover .moment-delete-btn {
     opacity: 0.7;
 }
 
 .moment-delete-btn:hover {
-    background-color: rgba(255, 107, 0, 0.1);
-    color: #ff6b00;
+    background-color: rgba(255, 90, 121, 0.1);
+    color: var(--ai-like-highlight);
     opacity: 1;
 }
 
+/* 更多操作按钮 */
 .moment-menu-btn {
     background: none;
     border: none;
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 20px;
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: all 0.2s;
 }
 
 .moment-menu-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--ai-primary);
 }
 
 /* 动态内容 */
 .moment-content {
-    color: #ddd;
+    color: var(--ai-body-text);
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 12px;
@@ -1870,7 +2026,7 @@ body {
 }
 
 .moment-expand-btn {
-    color: #ff6b00;
+    color: var(--ai-primary);
     font-size: 13px;
     cursor: pointer;
     background: none;
@@ -1883,11 +2039,83 @@ body {
     text-decoration: underline;
 }
 
+/* 底部操作区域 */
+.moment-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+    position: relative;
+}
+
+/* 更多按钮（··） */
+.moment-more-btn {
+    background: none;
+    border: none;
+    color: var(--ai-secondary-text);
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.moment-more-btn:hover {
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--ai-primary);
+}
+
+/* 赞和评论气泡弹出 */
+.moment-action-bubble {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4B5563;
+    border-radius: 6px;
+    display: none;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.moment-action-bubble.show {
+    display: flex;
+}
+
+.bubble-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: none;
+    border: none;
+    white-space: nowrap;
+}
+
+.bubble-action:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bubble-action.liked .bubble-icon {
+    color: var(--ai-like-highlight);
+}
+
+.bubble-divider {
+    width: 1px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
 /* 点赞和评论区域 */
 .moment-actions {
-    border-top: 1px solid #333;
-    padding-top: 12px;
-    margin-top: 12px;
+    border-top: none;
+    padding-top: 8px;
+    margin-top: 0;
 }
 
 .moment-likes {
@@ -1895,59 +2123,63 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background-color: rgba(255, 107, 0, 0.1);
-    border-radius: 4px;
+    background-color: rgba(93, 95, 239, 0.05);
+    border-radius: 6px;
     margin-bottom: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.moment-likes:hover {
-    background-color: rgba(255, 107, 0, 0.15);
 }
 
 .moment-likes-icon {
-    color: #ff6b00;
+    color: var(--ai-like-highlight);
     font-size: 14px;
 }
 
 .moment-likes-text {
-    color: #ddd;
+    color: var(--ai-body-text);
     font-size: 13px;
     flex: 1;
 }
 
 .moment-likes-count {
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 12px;
 }
 
 /* 评论列表 */
 .moment-comments {
     margin-top: 8px;
+    background-color: rgba(93, 95, 239, 0.03);
+    border-radius: 6px;
+    padding: 8px;
 }
 
 .moment-comment {
-    padding: 8px 12px;
-    background-color: rgba(255, 255, 255, 0.03);
+    padding: 6px 8px;
     border-radius: 4px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+}
+
+.moment-comment:last-child {
+    margin-bottom: 0;
 }
 
 .comment-main {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .comment-user {
-    color: #ff6b00;
+    color: var(--ai-primary);
     font-size: 13px;
     font-weight: 500;
 }
 
+.comment-reply-to {
+    color: var(--ai-secondary-text);
+}
+
 .comment-content {
-    color: #ddd;
+    color: var(--ai-body-text);
     font-size: 13px;
     line-height: 1.5;
 }
@@ -1956,16 +2188,17 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-top: 4px;
 }
 
 .comment-time {
-    color: #666;
+    color: var(--ai-secondary-text);
     font-size: 11px;
 }
 
 .comment-reply-btn,
 .comment-delete-btn {
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 12px;
     background: none;
     border: none;
@@ -1976,17 +2209,13 @@ body {
 }
 
 .comment-reply-btn:hover {
-    color: #ff6b00;
-    background-color: rgba(255, 107, 0, 0.1);
-}
-
-.comment-delete-btn {
-    color: #999;
+    color: var(--ai-primary);
+    background-color: rgba(93, 95, 239, 0.1);
 }
 
 .comment-delete-btn:hover {
-    color: #ff4444;
-    background-color: rgba(255, 68, 68, 0.1);
+    color: var(--ai-like-highlight);
+    background-color: rgba(255, 90, 121, 0.1);
 }
 
 /* 评论输入框 */
@@ -1994,7 +2223,7 @@ body {
     display: none;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #333;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .moment-comment-input.show {
@@ -2008,26 +2237,30 @@ body {
 
 .comment-input {
     flex: 1;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 4px;
+    background-color: var(--ai-bg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
     padding: 8px 12px;
-    color: #fff;
+    color: var(--ai-body-text);
     font-size: 13px;
     outline: none;
     transition: all 0.2s;
 }
 
 .comment-input:focus {
-    border-color: #ff6b00;
-    background-color: #333;
+    border-color: var(--ai-primary);
+    background-color: #fff;
+}
+
+.comment-input::placeholder {
+    color: var(--ai-secondary-text);
 }
 
 .comment-submit-btn {
-    background-color: #ff6b00;
+    background: var(--ai-primary-gradient);
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 8px 16px;
     font-size: 13px;
     cursor: pointer;
@@ -2035,13 +2268,16 @@ body {
 }
 
 .comment-submit-btn:hover {
-    background-color: #ff8533;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
 }
 
 .comment-submit-btn:disabled {
-    background-color: #444;
+    background: #E5E7EB;
     cursor: not-allowed;
     opacity: 0.5;
+    transform: none;
+    box-shadow: none;
 }
 
 /* 发布弹窗 */
@@ -2052,7 +2288,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 10001;
     align-items: center;
     justify-content: center;
@@ -2063,26 +2299,26 @@ body {
 }
 
 .publish-modal-content {
-    background-color: #222;
-    border-radius: 12px;
+    background-color: #fff;
+    border-radius: 16px;
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
 }
 
 .publish-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #333;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .publish-modal-header h3 {
-    color: #fff;
+    color: var(--ai-title-text);
     font-size: 18px;
     font-weight: 600;
     margin: 0;
@@ -2091,70 +2327,152 @@ body {
 .publish-modal-close {
     background: none;
     border: none;
-    color: #999;
-    font-size: 24px;
+    color: var(--ai-icon-default);
+    font-size: 20px;
     cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.2s;
 }
 
 .publish-modal-close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--ai-title-text);
+}
+
+/* 用户信息区域 */
+.publish-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 0;
+}
+
+.publish-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ai-primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.publish-user-name {
+    color: var(--ai-title-text);
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .publish-modal-body {
-    padding: 20px;
+    padding: 16px 20px;
     flex: 1;
     overflow-y: auto;
 }
 
 .publish-textarea {
     width: 100%;
-    min-height: 150px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 12px;
-    color: #fff;
-    font-size: 14px;
+    min-height: 120px;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    color: var(--ai-body-text);
+    font-size: 15px;
     line-height: 1.6;
-    resize: vertical;
+    resize: none;
     outline: none;
-    transition: all 0.2s;
     font-family: inherit;
 }
 
-.publish-textarea:focus {
-    border-color: #ff6b00;
-    background-color: #333;
+.publish-textarea::placeholder {
+    color: var(--ai-secondary-text);
 }
 
 .publish-char-count {
     text-align: right;
-    color: #999;
+    color: var(--ai-secondary-text);
     font-size: 12px;
     margin-top: 8px;
+}
+
+/* 附加功能区域 */
+.publish-extras {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 16px;
+}
+
+.publish-extra-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ai-icon-default);
+    font-size: 13px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.publish-extra-btn:hover {
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--ai-primary);
+}
+
+.publish-extra-btn .icon {
+    font-size: 18px;
+}
+
+/* 可见范围选择 */
+.publish-visibility {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.visibility-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.visibility-label {
+    color: var(--ai-body-text);
+    font-size: 14px;
+}
+
+.visibility-value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ai-secondary-text);
+    font-size: 14px;
 }
 
 .publish-modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    padding: 20px;
-    border-top: 1px solid #333;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .publish-cancel-btn,
 .publish-submit-btn {
     padding: 10px 24px;
-    border-radius: 6px;
+    border-radius: 20px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -2163,38 +2481,37 @@ body {
 }
 
 .publish-cancel-btn {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--ai-bg);
+    color: var(--ai-body-text);
 }
 
 .publish-cancel-btn:hover {
-    background-color: #444;
+    background-color: #E5E7EB;
 }
 
 .publish-submit-btn {
-    background-color: #ff6b00;
+    background: var(--ai-primary-gradient);
     color: #fff;
 }
 
 .publish-submit-btn:hover:not(:disabled) {
-    background-color: #ff8533;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
 }
 
 .publish-submit-btn:disabled {
-    background-color: #444;
+    background: #E5E7EB;
+    color: var(--ai-secondary-text);
     cursor: not-allowed;
-    opacity: 0.5;
 }
 
 /* 操作菜单 */
 .moment-action-menu {
     position: absolute;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     padding: 4px 0;
     min-width: 120px;
     z-index: 1000;
@@ -2207,7 +2524,7 @@ body {
 
 .action-menu-item {
     padding: 10px 16px;
-    color: #ddd;
+    color: var(--ai-body-text);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
@@ -2217,21 +2534,21 @@ body {
 }
 
 .action-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background-color: rgba(93, 95, 239, 0.1);
+    color: var(--ai-primary);
 }
 
 .action-menu-item.liked {
-    color: #ff6b00;
+    color: var(--ai-like-highlight);
 }
 
 /* 响应式设计 */
 @media (max-width: 1200px) {
     .ai-moments-sidebar {
-        width: 350px;
-        right: -350px;
+        width: 380px;
+        right: -380px;
     }
-    
+
     .ai-moments-sidebar.show {
         right: 0;
     }

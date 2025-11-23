@@ -314,14 +314,23 @@
     <!-- AI朋友圈侧边栏 -->
     <div class="ai-moments-sidebar" id="aiMomentsSidebar">
         <div class="moments-header">
-            <h2>AI朋友圈</h2>
-            <button class="moments-close-btn" id="momentsCloseBtn">✕</button>
+            <div class="moments-header-left">
+                <button class="moments-close-btn" id="momentsCloseBtn">✕</button>
+                <h2>AI朋友圈</h2>
+            </div>
+            <div class="moments-header-actions">
+                <button class="moments-header-btn" title="通知">🔔</button>
+                <button class="moments-header-btn" id="momentsRefreshBtn" title="刷新">🔄</button>
+                <button class="moments-header-btn camera-btn" id="momentsCameraBtn" title="发布">📷</button>
+            </div>
         </div>
-        
+
         <div class="moments-publish-area">
-            <button class="moments-publish-btn" id="momentsPublishBtn">
-                <span>✏️</span> 发布动态
-            </button>
+            <div class="moments-publish-card" id="publishCardTrigger">
+                <div class="publish-card-avatar">我</div>
+                <div class="publish-card-input">这一刻的想法…</div>
+                <button class="publish-card-btn" id="momentsPublishBtn">发一条</button>
+            </div>
         </div>
 
         <div class="moments-list" id="momentsList">
@@ -333,22 +342,43 @@
     <div class="moments-publish-modal" id="publishModal">
         <div class="publish-modal-content">
             <div class="publish-modal-header">
-                <h3>发布动态</h3>
+                <h3>发朋友圈</h3>
                 <button class="publish-modal-close" id="publishModalClose">✕</button>
             </div>
+            <div class="publish-user-info">
+                <div class="publish-user-avatar">我</div>
+                <div class="publish-user-name">我</div>
+            </div>
             <div class="publish-modal-body">
-                <textarea 
-                    class="publish-textarea" 
-                    id="publishTextarea" 
-                    placeholder="分享你的观剧感受..." 
+                <textarea
+                    class="publish-textarea"
+                    id="publishTextarea"
+                    placeholder="这一刻的想法…"
                     maxlength="500"></textarea>
                 <div class="publish-char-count">
                     <span id="charCount">0</span>/500
                 </div>
             </div>
+            <div class="publish-extras">
+                <button class="publish-extra-btn" title="添加图片">
+                    <span class="icon">🖼️</span>
+                </button>
+                <button class="publish-extra-btn" title="添加视频">
+                    <span class="icon">🎬</span>
+                </button>
+                <button class="publish-extra-btn" title="AI生成文案">
+                    <span class="icon">✨</span>
+                </button>
+            </div>
+            <div class="publish-visibility">
+                <div class="visibility-selector">
+                    <span class="visibility-label">谁可以看</span>
+                    <span class="visibility-value">公开 ›</span>
+                </div>
+            </div>
             <div class="publish-modal-footer">
                 <button class="publish-cancel-btn" id="publishCancelBtn">取消</button>
-                <button class="publish-submit-btn" id="publishSubmitBtn" disabled>发布</button>
+                <button class="publish-submit-btn" id="publishSubmitBtn" disabled>发表</button>
             </div>
         </div>
     </div>

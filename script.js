@@ -520,6 +520,9 @@ function initAIMoments() {
     const aiMomentsSidebar = document.getElementById('aiMomentsSidebar');
     const momentsCloseBtn = document.getElementById('momentsCloseBtn');
     const momentsPublishBtn = document.getElementById('momentsPublishBtn');
+    const publishCardTrigger = document.getElementById('publishCardTrigger');
+    const momentsRefreshBtn = document.getElementById('momentsRefreshBtn');
+    const momentsCameraBtn = document.getElementById('momentsCameraBtn');
     const publishModal = document.getElementById('publishModal');
     const publishModalClose = document.getElementById('publishModalClose');
     const publishCancelBtn = document.getElementById('publishCancelBtn');
@@ -549,9 +552,58 @@ function initAIMoments() {
         });
     }
 
+    // 刷新按钮
+    if (momentsRefreshBtn) {
+        momentsRefreshBtn.addEventListener('click', function() {
+            loadMoments();
+            showToast('刷新成功');
+        });
+    }
+
+    // 相机按钮（短按发布，长按未实现）
+    if (momentsCameraBtn) {
+        let pressTimer = null;
+
+        momentsCameraBtn.addEventListener('mousedown', function() {
+            pressTimer = setTimeout(() => {
+                // 长按：进入文字发布页（当前弹窗实现）
+                publishModal.classList.add('show');
+                publishTextarea.value = '';
+                charCount.textContent = '0';
+                publishSubmitBtn.disabled = true;
+            }, 500);
+        });
+
+        momentsCameraBtn.addEventListener('mouseup', function() {
+            clearTimeout(pressTimer);
+        });
+
+        momentsCameraBtn.addEventListener('mouseleave', function() {
+            clearTimeout(pressTimer);
+        });
+
+        momentsCameraBtn.addEventListener('click', function() {
+            // 短按：打开发布弹窗
+            publishModal.classList.add('show');
+            publishTextarea.value = '';
+            charCount.textContent = '0';
+            publishSubmitBtn.disabled = true;
+        });
+    }
+
     // 打开发布弹窗
     if (momentsPublishBtn) {
         momentsPublishBtn.addEventListener('click', function() {
+            publishModal.classList.add('show');
+            publishTextarea.value = '';
+            charCount.textContent = '0';
+            publishSubmitBtn.disabled = true;
+        });
+    }
+
+    // 发布入口卡片点击
+    if (publishCardTrigger) {
+        publishCardTrigger.addEventListener('click', function() {
             publishModal.classList.add('show');
             publishTextarea.value = '';
             charCount.textContent = '0';
@@ -638,45 +690,76 @@ function initAIMoments() {
         const momentsList = document.getElementById('momentsList');
         if (!momentsList) return;
 
-        momentsList.innerHTML = moments.map(moment => `
-            <div class="moment-item" data-id="${moment.id}">
+        momentsList.innerHTML = moments.map(moment => {
+            const isAI = moment.userId && moment.userId.startsWith('ai-');
+            const userLiked = moment.likes && moment.likes.some(like => like.userId === 'user');
+            const likesText = moment.likes && moment.likes.length > 0
+                ? moment.likes.map(l => l.username).join('、')
+                : '';
+
+            return `
+            <div class="moment-card" data-id="${moment.id}">
                 <div class="moment-header">
-                    <div class="moment-user">
-                        <div class="moment-avatar">${moment.username.charAt(0)}</div>
-                        <div class="moment-user-info">
-                            <div class="moment-username">${moment.username}</div>
-                            <div class="moment-time">${formatTime(moment.timestamp)}</div>
+                    <div class="moment-avatar moment-avatar-placeholder ${isAI ? 'ai-star' : ''}">${moment.username.charAt(0)}</div>
+                    <div class="moment-user-info">
+                        <div class="moment-user-row">
+                            <span class="moment-username">${moment.username}</span>
+                            ${isAI ? '<span class="ai-star-tag">AI明星</span>' : ''}
+                        </div>
+                        <div class="moment-meta-row">
+                            <span class="moment-time">${formatTime(moment.timestamp)}</span>
+                            ${isAI ? '<span class="official-badge">⭐ 官方推荐</span>' : ''}
                         </div>
                     </div>
+                    ${moment.userId === 'user' ? `
+                        <div class="moment-header-actions">
+                            <button class="moment-delete-btn" data-id="${moment.id}" title="删除">🗑️</button>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="moment-content">${moment.content}</div>
-                <div class="moment-actions">
-                    <button class="moment-action-btn like-btn ${moment.likes && moment.likes.some(like => like.userId === 'user') ? 'liked' : ''}" data-id="${moment.id}">
-                        <span>👍</span>
-                        <span class="like-count">${moment.likes ? moment.likes.length : 0}</span>
-                    </button>
-                    <button class="moment-action-btn comment-btn" data-id="${moment.id}">
-                        <span>💬</span>
-                        <span class="comment-count">${moment.comments ? moment.comments.length : 0}</span>
-                    </button>
+                <div class="moment-footer">
+                    <div class="moment-action-bubble" id="bubble-${moment.id}">
+                        <button class="bubble-action ${userLiked ? 'liked' : ''}" data-action="like" data-id="${moment.id}">
+                            <span class="bubble-icon">${userLiked ? '❤️' : '🤍'}</span>
+                            <span>${userLiked ? '取消' : '赞'}</span>
+                        </button>
+                        <div class="bubble-divider"></div>
+                        <button class="bubble-action" data-action="comment" data-id="${moment.id}">
+                            <span class="bubble-icon">💬</span>
+                            <span>评论</span>
+                        </button>
+                    </div>
+                    <button class="moment-more-btn" data-id="${moment.id}">··</button>
                 </div>
+                ${moment.likes && moment.likes.length > 0 ? `
+                    <div class="moment-actions">
+                        <div class="moment-likes">
+                            <span class="moment-likes-icon">❤️</span>
+                            <span class="moment-likes-text">${likesText}</span>
+                        </div>
+                    </div>
+                ` : ''}
                 ${moment.comments && moment.comments.length > 0 ? `
                     <div class="moment-comments">
                         ${moment.comments.map(comment => `
                             <div class="moment-comment">
-                                <span class="comment-user">${comment.username}</span>
-                                ${comment.replyTo ? `<span class="comment-reply">回复 ${comment.replyTo}</span>` : ''}
-                                <span class="comment-content">: ${comment.content}</span>
+                                <div class="comment-main">
+                                    <span class="comment-user">${comment.username}${comment.replyTo ? `<span class="comment-reply-to"> 回复 ${comment.replyTo}</span>` : ''}</span>
+                                    <span class="comment-content">${comment.content}</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
                 ` : ''}
-                <div class="moment-comment-input" style="display: none;">
-                    <input type="text" class="comment-input" placeholder="说点什么..." data-id="${moment.id}">
-                    <button class="comment-send-btn" data-id="${moment.id}">发送</button>
+                <div class="moment-comment-input" id="comment-input-${moment.id}">
+                    <div class="comment-input-box">
+                        <input type="text" class="comment-input" placeholder="说点什么..." data-id="${moment.id}">
+                        <button class="comment-submit-btn" data-id="${moment.id}">发送</button>
+                    </div>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
 
         // 绑定事件
         bindMomentEvents();
@@ -684,35 +767,84 @@ function initAIMoments() {
 
     // 绑定动态事件
     function bindMomentEvents() {
-        // 点赞按钮
-        document.querySelectorAll('.like-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
+        // 更多按钮（显示气泡）
+        document.querySelectorAll('.moment-more-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const momentId = this.dataset.id;
-                await toggleLike(momentId);
+                const bubble = document.getElementById(`bubble-${momentId}`);
+
+                // 关闭其他气泡
+                document.querySelectorAll('.moment-action-bubble.show').forEach(b => {
+                    if (b !== bubble) b.classList.remove('show');
+                });
+
+                bubble.classList.toggle('show');
             });
         });
 
-        // 评论按钮
-        document.querySelectorAll('.comment-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        // 气泡内的操作
+        document.querySelectorAll('.bubble-action').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const action = this.dataset.action;
                 const momentId = this.dataset.id;
-                const momentItem = document.querySelector(`.moment-item[data-id="${momentId}"]`);
-                const commentInput = momentItem.querySelector('.moment-comment-input');
-                commentInput.style.display = commentInput.style.display === 'none' ? 'flex' : 'none';
+                const bubble = document.getElementById(`bubble-${momentId}`);
+
+                if (action === 'like') {
+                    await toggleLike(momentId);
+                } else if (action === 'comment') {
+                    const commentInput = document.getElementById(`comment-input-${momentId}`);
+                    commentInput.classList.toggle('show');
+                    if (commentInput.classList.contains('show')) {
+                        commentInput.querySelector('.comment-input').focus();
+                    }
+                }
+
+                bubble.classList.remove('show');
+            });
+        });
+
+        // 点击外部关闭气泡
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.moment-action-bubble.show').forEach(b => {
+                b.classList.remove('show');
+            });
+        });
+
+        // 删除按钮
+        document.querySelectorAll('.moment-delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const momentId = this.dataset.id;
+                if (confirm('确定要删除这条动态吗？')) {
+                    try {
+                        const response = await fetch(`${API_BASE}/moments/${momentId}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            showToast('删除成功');
+                            loadMoments();
+                        }
+                    } catch (error) {
+                        console.error('删除失败:', error);
+                        showToast('删除失败');
+                    }
+                }
             });
         });
 
         // 发送评论按钮
-        document.querySelectorAll('.comment-send-btn').forEach(btn => {
+        document.querySelectorAll('.comment-submit-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const momentId = this.dataset.id;
-                const momentItem = document.querySelector(`.moment-item[data-id="${momentId}"]`);
-                const input = momentItem.querySelector('.comment-input');
+                const commentInput = document.getElementById(`comment-input-${momentId}`);
+                const input = commentInput.querySelector('.comment-input');
                 const content = input.value.trim();
 
                 if (content) {
                     await submitComment(momentId, content);
                     input.value = '';
+                    commentInput.classList.remove('show');
                 }
             });
         });
@@ -721,7 +853,7 @@ function initAIMoments() {
         document.querySelectorAll('.comment-input').forEach(input => {
             input.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    const btn = this.parentElement.querySelector('.comment-send-btn');
+                    const btn = this.parentElement.querySelector('.comment-submit-btn');
                     btn.click();
                 }
             });
