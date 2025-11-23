@@ -169,22 +169,33 @@
             <!-- 用户评价 -->
             <div class="video-info">
                 <div class="user-reviews-horizontal">
-                    <div class="reviews-header">
-                        <img src="icon/用户评价标题.png" alt="用户评价" class="reviews-title-img">
-                    </div>
-                    <div class="reviews-container">
-                        <img src="icon/用户评价.png" alt="用户评价" class="reviews-content-img">
-                    </div>
+                
+                <!-- 标题 -->
+                <div class="reviews-header">
+                    <img src="icon/用户评价标题.png" alt="用户评价" class="reviews-title-img">
                 </div>
+            
+                <!-- 一行四张 png -->
+                <div class="reviews-container reviews-images">
+                    <img src="icon/review-score.png"  alt="评分卡片" class="review-img review-img-score">
+                    <img src="icon/review-1.png"      alt="用户评论1" class="review-img review-img-comment">
+                    <img src="icon/review-2.png"      alt="用户评论2" class="review-img review-img-comment">
+                    <img src="icon/review-3.png"      alt="用户评论3" class="review-img review-img-comment">
+                </div>
+            
+                </div>
+            </div>
+  
 
                 <!-- 演员表 -->
-                <div class="cast-info">
-                    <h3>本剧演员</h3>
+                <section class="cast-section">
+                    <h2 class="section-title">本剧演员</h2>
                     <div class="cast-list">
-                        <div class="cast-item">
-                            <img src="icon/赵露思.png" alt="赵露思" class="cast-avatar-img">
-                            <div class="cast-name">赵露思</div>
-                        </div>
+                        <!-- 赵露思：选中状态，有绿色箭头 -->
+                        <button class="cast-tab is-active">
+                            <img src="icon/赵露思.png" alt="赵露思" class="cast-avatar">
+                            <span class="cast-name">赵露思</span>
+                        </button>
                         <div class="cast-item">
                             <img src="icon/陈伟霆.png" alt="陈伟霆" class="cast-avatar-img">
                             <div class="cast-name">陈伟霆</div>
@@ -198,9 +209,21 @@
                             <div class="cast-name">唐晓天</div>
                         </div>
                     </div>
+
+                    <!-- 赵露思代表作品 -->
+                        <div class="actor-works">
+                            <img src="icon/1许我耀眼.png" alt="许我耀眼" class="actor-works-img">
+                            <img src="icon/2神隐.png" alt="神隐" class="actor-works-img">
+                            <img src="icon/3月升沧海.png" alt="月升沧海" class="actor-works-img">
+                            <img src="icon/4且试天下.png" alt="且试天下" class="actor-works-img">
+                            <img src="icon/5我喜欢你.png" alt="我喜欢你" class="actor-works-img">
+                            <img src="icon/6传闻中的陈芊芊.png" alt="传闻中的陈芊芊" class="actor-works-img">
+                        </div>
+                    </section> <!-- 这里关掉的是 .video-section -->
                 </div>
             </div>
         </div>
+        
 
         <!-- 右侧边栏 -->
         <aside class="sidebar">

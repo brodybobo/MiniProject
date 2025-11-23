@@ -2181,3 +2181,69 @@ body {
     }
 }
 
+/* ===== 本剧演员模块：赵露思选中效果 ===== */
+
+/* 赵露思按钮：胶囊形背景 + 头像 + 名字 */
+.cast-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #262626;      /* 深色胶囊背景 */
+    cursor: pointer;
+    color: #ffffff;
+}
+
+/* 赵露思头像（覆盖原有 .cast-avatar 的表现） */
+.cast-tab .cast-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0;
+    background-color: transparent;
+    border: 3px solid #00e4c4;
+    box-shadow: 0 0 8px rgba(0, 228, 196, 0.5);
+}
+
+/* 赵露思名字字号 */
+.cast-tab .cast-name {
+    font-size: 14px;
+}
+
+/* 选中状态：头像外圈绿色高亮边框（默认已显示） */
+.cast-tab.is-active .cast-avatar {
+    border: 3px solid #00e4c4;
+    box-shadow: 0 0 8px rgba(0, 228, 196, 0.5);
+}
+
+/* 选中状态：按钮底部的绿色小箭头 */
+.cast-tab.is-active::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #00e4c4;
+}
+
+/* 赵露思代表作图片容器，与上面头像区域拉开一点间距 */
+.actor-works {
+    margin-top: 24px;
+}
+
+/* 代表作横向大图（第二张 PNG） */
+.actor-works-img {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    border-radius: 16px;
+}
