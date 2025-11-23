@@ -2231,9 +2231,9 @@ body {
 }
 
 .moment-images-1 .moment-image {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
+    width: 183px;
+    height: 245px;
+    object-fit: cover;
 }
 
 /* 两张图片 */
@@ -2278,6 +2278,67 @@ body {
 
 .moment-image:hover {
     transform: scale(1.02);
+}
+
+/* 图片预览模态框 */
+.image-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 10002;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+.image-preview-modal.show {
+    display: flex;
+}
+
+.image-preview-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+    z-index: 10003;
+}
+
+.image-preview-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.image-preview-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    cursor: default;
+    animation: imageZoomIn 0.3s ease-out;
+}
+
+@keyframes imageZoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .moment-expand-btn:hover {

@@ -733,6 +733,29 @@ function initAIMoments() {
         });
     }
 
+    // 图片预览功能
+    const imagePreviewModal = document.getElementById('imagePreviewModal');
+    const imagePreviewImg = document.getElementById('imagePreviewImg');
+    const imagePreviewClose = document.getElementById('imagePreviewClose');
+
+    // 关闭图片预览
+    function closeImagePreview() {
+        imagePreviewModal.classList.remove('show');
+        imagePreviewImg.src = '';
+    }
+
+    if (imagePreviewClose) {
+        imagePreviewClose.addEventListener('click', closeImagePreview);
+    }
+
+    if (imagePreviewModal) {
+        imagePreviewModal.addEventListener('click', function(e) {
+            if (e.target === imagePreviewModal) {
+                closeImagePreview();
+            }
+        });
+    }
+
     // 加载动态列表
     async function loadMoments() {
         try {
@@ -938,6 +961,15 @@ function initAIMoments() {
                     const btn = this.parentElement.querySelector('.comment-submit-btn');
                     btn.click();
                 }
+            });
+        });
+
+        // 图片点击预览
+        document.querySelectorAll('.moment-image').forEach(img => {
+            img.addEventListener('click', function(e) {
+                e.stopPropagation();
+                imagePreviewImg.src = this.src;
+                imagePreviewModal.classList.add('show');
             });
         });
     }
