@@ -58,13 +58,25 @@ body {
     color: #999;
     text-decoration: none;
     font-size: 14px;
-    transition: color 0.3s;
+    transition: all 0.3s;
     padding: 4px 0;
+    display: flex;
+    align-items: center;
 }
 
 .nav-item:hover,
 .nav-item.active {
     color: #fff;
+}
+
+.nav-icon {
+    height: 24px;
+    width: auto;
+    transition: all 0.3s;
+}
+
+.nav-item:hover .nav-icon {
+    transform: scale(1.1);
 }
 
 .header-right {
@@ -83,11 +95,23 @@ body {
     color: #999;
     font-size: 12px;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
 }
 
 .header-icon:hover {
     color: #fff;
+}
+
+.header-icon-img {
+    height: 20px;
+    width: auto;
+    transition: all 0.3s;
+}
+
+.header-icon:hover .header-icon-img {
+    transform: scale(1.1);
 }
 
 .search-box {
@@ -1071,26 +1095,26 @@ body {
     color: #fff;
 }
 
+/* 用户评价图片样式 */
+.reviews-title-img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    display: block;
+}
+
+.reviews-content-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
 .reviews-container {
-    display: flex;
-    gap: 15px;
-    overflow-x: auto;
     padding-bottom: 10px;
 }
 
-.reviews-container::-webkit-scrollbar {
-    height: 6px;
-}
-
-.reviews-container::-webkit-scrollbar-track {
-    background: #0a0a0a;
-    border-radius: 3px;
-}
-
-.reviews-container::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
-}
+/* 滚动条样式已移除 - 使用图片原比例显示 */
 
 .review-card {
     background-color: #0a0a0a;
