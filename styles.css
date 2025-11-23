@@ -1735,6 +1735,60 @@ body {
     color: var(--ai-primary);
 }
 
+/* 通知按钮图标样式 */
+.moments-notification-btn {
+    width: 36px;
+    height: 36px;
+    position: relative;
+}
+
+.moments-notification-btn .notification-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* 刷新按钮图标样式 */
+.moments-refresh-btn {
+    width: 36px;
+    height: 36px;
+    position: relative;
+}
+
+.moments-refresh-btn .refresh-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+/* 相机按钮图标样式 */
+.moments-camera-btn {
+    width: 36px;
+    height: 36px;
+    position: relative;
+}
+
+.moments-camera-btn .camera-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* 刷新动画 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.moments-refresh-btn.refreshing .refresh-icon {
+    animation: spin 1.5s linear;
+}
+
 .moments-close-btn {
     background: none;
     border: none;

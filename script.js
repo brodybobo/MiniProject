@@ -573,8 +573,27 @@ function initAIMoments() {
     // 刷新按钮
     if (momentsRefreshBtn) {
         momentsRefreshBtn.addEventListener('click', function() {
+            const refreshIcon = this.querySelector('.refresh-icon');
+
+            // 防止重复点击
+            if (this.classList.contains('refreshing')) {
+                return;
+            }
+
+            // 添加刷新中状态
+            this.classList.add('refreshing');
+
+            // 切换为朋友圈logo并开始旋转
+            refreshIcon.src = 'icon/朋友圈logo.png';
+
+            // 加载数据
             loadMoments();
-            showToast('刷新成功');
+
+            // 1.5秒后恢复原图标
+            setTimeout(() => {
+                refreshIcon.src = 'icon/刷新logo.png';
+                this.classList.remove('refreshing');
+            }, 1500);
         });
     }
 
