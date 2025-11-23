@@ -820,21 +820,30 @@ function initAIMoments() {
                     };
                     locationLabel.textContent = location;
                 } else {
-                    locationLabel.textContent = originalText;
-                    showToast('获取地址失败');
+                    // 获取地址失败，使用默认地址
+                    const defaultLocation = '深圳腾讯滨海大厦';
+                    currentLocation = {
+                        latitude,
+                        longitude,
+                        address: defaultLocation
+                    };
+                    locationLabel.textContent = defaultLocation;
                 }
             } catch (error) {
                 console.error('定位失败:', error);
-                locationLabel.textContent = originalText;
 
+                // 定位超时或失败，使用默认地址
+                const defaultLocation = '深圳腾讯滨海大厦';
+                currentLocation = {
+                    latitude: 0,
+                    longitude: 0,
+                    address: defaultLocation
+                };
+                locationLabel.textContent = defaultLocation;
+
+                // 只有权限被拒绝时才显示toast，其他情况静默使用默认地址
                 if (error.code === 1) {
                     showToast('定位权限被拒绝');
-                } else if (error.code === 2) {
-                    showToast('无法获取位置信息');
-                } else if (error.code === 3) {
-                    showToast('定位超时');
-                } else {
-                    showToast('定位失败');
                 }
             }
         });
@@ -932,7 +941,6 @@ function initAIMoments() {
                 if (response.ok) {
                     console.log('✅ 发布成功');
                     publishModal.classList.remove('show');
-                    showToast('发布成功！AI将在10-30秒内互动');
                     loadMoments();
 
                     // 重置位置
