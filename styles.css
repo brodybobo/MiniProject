@@ -406,10 +406,25 @@ body {
 .danmaku-input-container {
     display: flex;
     align-items: center;
-    background-color: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 4px 8px;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
     margin-left: 8px;
+}
+
+/* 弹幕按钮图片大小 */
+.danmaku-switch-btn img,
+.danmaku-settings-btn img {
+    height: 24px;
+    display: block;
+}
+
+/* 弹幕输入框图片大小 */
+.danmaku-send-image {
+    width: 280px;
+    height: 28px;
+    display: block;
+    object-fit: contain;
 }
 
 .danmaku-input {
