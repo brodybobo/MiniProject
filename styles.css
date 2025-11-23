@@ -1634,12 +1634,17 @@ body {
 
 /* AI朋友圈按钮 */
 .ai-moments-btn {
-    background-color: rgba(255, 107, 0, 0.2);
-    border: 1px solid #ff6b00;
+    background-color: #000000;
+    border: 1px solid #ffe6a5;
+}
+
+.ai-moments-btn img {
+    height: 24px;  /* 放大图标 */
 }
 
 .ai-moments-btn:hover {
-    background-color: rgba(255, 107, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.8);
+    border-color: #ffe6a5;
 }
 
 /* AI朋友圈侧边栏 */
