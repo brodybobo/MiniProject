@@ -1156,7 +1156,11 @@ function initAIMoments() {
     function bindMomentEvents() {
         // 更多按钮（显示气泡）
         document.querySelectorAll('.moment-more-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            // 移除旧的监听器（通过克隆节点）
+            const newBtn = btn.cloneNode(true);
+            btn.replaceWith(newBtn);
+
+            newBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const momentId = this.dataset.id;
                 const bubble = document.getElementById(`bubble-${momentId}`);
@@ -1172,11 +1176,17 @@ function initAIMoments() {
 
         // 气泡内的操作
         document.querySelectorAll('.bubble-action').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
+            // 移除旧的监听器（通过克隆节点）
+            const newBtn = btn.cloneNode(true);
+            btn.replaceWith(newBtn);
+
+            newBtn.addEventListener('click', async function(e) {
                 e.stopPropagation();
                 const action = this.dataset.action;
                 const momentId = this.dataset.id;
                 const bubble = document.getElementById(`bubble-${momentId}`);
+
+                console.log('🎯 气泡按钮点击 - action:', action, 'momentId:', momentId);
 
                 if (action === 'like') {
                     await toggleLike(momentId);
@@ -1194,7 +1204,11 @@ function initAIMoments() {
 
         // 删除按钮
         document.querySelectorAll('.moment-delete-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            // 移除旧的监听器
+            const newBtn = btn.cloneNode(true);
+            btn.replaceWith(newBtn);
+
+            newBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const momentId = this.getAttribute('data-id');
                 console.log('🗑️ 删除按钮点击 - ID:', momentId, 'dataset.id:', this.dataset.id, 'element:', this);
@@ -1204,7 +1218,11 @@ function initAIMoments() {
 
         // 发送评论按钮
         document.querySelectorAll('.comment-submit-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
+            // 移除旧的监听器
+            const newBtn = btn.cloneNode(true);
+            btn.replaceWith(newBtn);
+
+            newBtn.addEventListener('click', async function() {
                 const momentId = this.dataset.id;
                 const commentInput = document.getElementById(`comment-input-${momentId}`);
                 const input = commentInput.querySelector('.comment-input');
@@ -1220,7 +1238,11 @@ function initAIMoments() {
 
         // 评论输入框回车发送
         document.querySelectorAll('.comment-input').forEach(input => {
-            input.addEventListener('keypress', function(e) {
+            // 移除旧的监听器
+            const newInput = input.cloneNode(true);
+            input.replaceWith(newInput);
+
+            newInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     const btn = this.parentElement.querySelector('.comment-submit-btn');
                     btn.click();
@@ -1230,7 +1252,11 @@ function initAIMoments() {
 
         // 图片点击预览
         document.querySelectorAll('.moment-image').forEach(img => {
-            img.addEventListener('click', function(e) {
+            // 移除旧的监听器
+            const newImg = img.cloneNode(true);
+            img.replaceWith(newImg);
+
+            newImg.addEventListener('click', function(e) {
                 e.stopPropagation();
                 imagePreviewImg.src = this.src;
                 imagePreviewModal.classList.add('show');
@@ -1241,6 +1267,7 @@ function initAIMoments() {
     // 切换点赞
     async function toggleLike(momentId) {
         try {
+            console.log('👍 开始点赞操作 - momentId:', momentId);
             const response = await fetch(`${API_BASE}/moments/${momentId}/like`, {
                 method: 'POST',
                 headers: {
@@ -1252,11 +1279,17 @@ function initAIMoments() {
                 })
             });
 
+            console.log('👍 点赞API响应 - status:', response.status, 'ok:', response.ok);
+
             if (response.ok) {
+                const result = await response.json();
+                console.log('✅ 点赞成功 - 结果:', result);
                 loadMoments();
+            } else {
+                console.error('❌ 点赞失败 - status:', response.status);
             }
         } catch (error) {
-            console.error('点赞失败:', error);
+            console.error('❌ 点赞失败 - 异常:', error);
         }
     }
 
