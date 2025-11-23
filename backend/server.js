@@ -534,6 +534,19 @@ app.listen(PORT, () => {
     initializeData();
 });
 
+// 全局错误处理 - 防止未捕获的异常导致服务器崩溃
+process.on('uncaughtException', (error) => {
+    console.error('❌ 未捕获的异常:', error);
+    console.error('堆栈追踪:', error.stack);
+    // 不退出进程，继续运行
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ 未处理的Promise拒绝:', reason);
+    console.error('Promise:', promise);
+    // 不退出进程，继续运行
+});
+
 // 优雅关闭
 process.on('SIGINT', () => {
     console.log('\n👋 服务器正在关闭...');
