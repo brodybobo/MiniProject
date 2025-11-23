@@ -73,6 +73,10 @@ function initVideoPlayer() {
     player.on('ready', function() {
         console.log('播放器准备就绪');
 
+        // 初始化进度条和时间显示为0
+        updateProgress();
+        updateTimeDisplay();
+
         // 只使用一个监听器，在最底层的video元素上监听，并阻止冒泡
         const videoEl = document.querySelector('#my-video_html5_api');
         if (videoEl) {
@@ -212,9 +216,15 @@ function updatePlayButton(isPaused) {
 // 更新进度条
 function updateProgress() {
     const progressPlayed = document.getElementById('progressPlayed');
-    if (progressPlayed && player.duration()) {
-        const percent = (player.currentTime() / player.duration()) * 100;
-        progressPlayed.style.width = percent + '%';
+    if (progressPlayed) {
+        const duration = player.duration();
+        // 如果没有视频,进度保持0
+        if (!duration || isNaN(duration) || duration === 0) {
+            progressPlayed.style.width = '0%';
+        } else {
+            const percent = (player.currentTime() / duration) * 100;
+            progressPlayed.style.width = percent + '%';
+        }
     }
 }
 
@@ -222,10 +232,26 @@ function updateProgress() {
 function updateTimeDisplay() {
     const currentTimeEl = document.getElementById('currentTime');
     const totalTimeEl = document.getElementById('totalTime');
+    const timeSeparator = document.getElementById('timeSeparator');
 
     if (currentTimeEl && totalTimeEl) {
-        currentTimeEl.textContent = formatTime(player.currentTime());
-        totalTimeEl.textContent = formatTime(player.duration());
+        const duration = player.duration();
+        const currentTime = player.currentTime();
+
+        // 如果没有视频(duration为NaN或0),不显示时长
+        if (isNaN(duration) || duration === 0) {
+            currentTimeEl.textContent = '00:00';
+            totalTimeEl.textContent = '';  // 隐藏总时长
+            if (timeSeparator) {
+                timeSeparator.style.display = 'none';  // 隐藏分隔符
+            }
+        } else {
+            currentTimeEl.textContent = formatTime(currentTime);
+            totalTimeEl.textContent = formatTime(duration);
+            if (timeSeparator) {
+                timeSeparator.style.display = 'inline';  // 显示分隔符
+            }
+        }
     }
 }
 
