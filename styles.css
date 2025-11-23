@@ -30,7 +30,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 56px;
+    height: 68px;
 }
 
 .header-left {
@@ -241,7 +241,8 @@ body {
     background-color: #000;
     border-radius: 8px;
     overflow: hidden;
-    aspect-ratio: 16 / 9;
+    width: 1080px;
+    height: 608px;
     margin-bottom: 20px;
 }
 
@@ -755,9 +756,10 @@ body {
 
 /* 选集面板 */
 .episodes-panel {
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 20px;
 }
 
 .panel-header {
