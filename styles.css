@@ -495,9 +495,9 @@ body {
 
 .cast-list {
     display: flex;
-    gap: 0;
+    gap: 40px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 }
 
 .cast-list::-webkit-scrollbar {
@@ -515,18 +515,18 @@ body {
 
 .cast-item {
     flex-shrink: 0;
-    width: 180px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 8px;
+    gap: 10px;
+    padding: 8px 80px 8px 8px;
+    border-radius: 999px;
+    background: #202020;              /* 深灰色胶囊背景 */
     transition: background 0.2s;
     cursor: pointer;
 }
 
 .cast-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: #4a4a4a;
 }
 
 .cast-item:first-child .cast-name {
@@ -540,7 +540,7 @@ body {
     display: block;
     object-fit: cover;
     flex-shrink: 0;
-    border: 2px solid #2a2a2a;
+    border: none;
 }
 
 .cast-name {
@@ -2183,7 +2183,7 @@ body {
 
 /* ===== 本剧演员模块：赵露思选中效果 ===== */
 
-/* 赵露思按钮：胶囊形背景 + 头像 + 名字 */
+/* 赵露思按钮：透明背景 + 头像 + 名字 */
 .cast-tab {
     position: relative;
     display: inline-flex;
@@ -2192,35 +2192,42 @@ body {
     padding: 6px 14px;
     border-radius: 999px;
     border: none;
-    background: #262626;      /* 深色胶囊背景 */
+    background: transparent;          /* 完全透明背景 */
     cursor: pointer;
     color: #ffffff;
+    flex-shrink: 0;
 }
+
 
 /* 赵露思头像（覆盖原有 .cast-avatar 的表现） */
 .cast-tab .cast-avatar {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
     margin: 0;
     background-color: transparent;
-    border: 3px solid #00e4c4;
+    border: 3px solid #00e4c4;        /* 绿色边框 */
     box-shadow: 0 0 8px rgba(0, 228, 196, 0.5);
 }
 
 /* 赵露思名字字号 */
 .cast-tab .cast-name {
     font-size: 14px;
+    color: #00e4c4;                   /* 绿色名字 */
 }
 
 /* 选中状态：头像外圈绿色高亮边框（默认已显示） */
 .cast-tab.is-active .cast-avatar {
-    border: 3px solid #00e4c4;
-    box-shadow: 0 0 8px rgba(0, 228, 196, 0.5);
+    border: 3px solid #00e4c4;        /* 绿色边框 */
+    box-shadow: 0 0 8px rgba(0, 228, 196, 0.6);
 }
 
+/* 选中状态：赵露思名字高亮为绿色 */
+.cast-tab.is-active .cast-name {
+    color: #00e4c4;
+}
 /* 选中状态：按钮底部的绿色小箭头 */
 .cast-tab.is-active::after {
     content: "";
@@ -2235,15 +2242,24 @@ body {
     border-top: 6px solid #00e4c4;
 }
 
-/* 赵露思代表作图片容器，与上面头像区域拉开一点间距 */
+/* 赵露思代表作区域：卡片更小，间距更大，一行横向排布 */
 .actor-works {
     margin-top: 24px;
+    display: flex;
+    gap: 32px;          /* 卡片之间的间距，原来几乎为 0 */
+    overflow-x: auto;   /* 超出一行时可以左右滚动 */
+    padding: 8px 0 12px;
 }
 
-/* 代表作横向大图（第二张 PNG） */
+/* 单张代表作卡片：缩小宽度 */
 .actor-works-img {
-    width: 100%;
-    max-width: 100%;
+    width: 185px;       /* 从原来的 100% 改为固定小卡片宽度 */
+    height: auto;
+    flex-shrink: 0;
     display: block;
     border-radius: 16px;
 }
+
+
+
+
