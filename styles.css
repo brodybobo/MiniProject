@@ -1114,6 +1114,31 @@ body {
     padding-bottom: 10px;
 }
 
+/* 用户评价图片一行四张样式 */
+.reviews-container.reviews-images {
+    display: flex;
+    gap: 12px;
+    overflow-x: hidden;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.review-img {
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.review-img-score {
+    flex: 297 1 0;
+    min-width: 0;
+}
+
+.review-img-comment {
+    flex: 341 1 0;
+    min-width: 0;
+}
+
 
 .review-card {
     background-color: #0a0a0a;
