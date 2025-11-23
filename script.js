@@ -521,6 +521,7 @@ function initAIMoments() {
     const momentsCloseBtn = document.getElementById('momentsCloseBtn');
     const momentsRefreshBtn = document.getElementById('momentsRefreshBtn');
     const momentsCameraBtn = document.getElementById('momentsCameraBtn');
+    const momentImageInput = document.getElementById('momentImageInput');
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationsPanel = document.getElementById('notificationsPanel');
     const notificationsBackBtn = document.getElementById('notificationsBackBtn');
@@ -530,10 +531,13 @@ function initAIMoments() {
     const publishSubmitBtn = document.getElementById('publishSubmitBtn');
     const publishTextarea = document.getElementById('publishTextarea');
     const charCount = document.getElementById('charCount');
+    const publishImagesPreview = document.getElementById('publishImagesPreview');
+    const previewImagesGrid = document.getElementById('previewImagesGrid');
 
     // API配置
     const API_BASE = 'http://localhost:3000/api';
     let moments = [];
+    let selectedImages = []; // 存储选中的图片文件
     let autoRefreshInterval = null;
 
     // 打开AI朋友圈侧边栏
@@ -616,10 +620,13 @@ function initAIMoments() {
     // 相机按钮（短按发布，长按未实现）
     if (momentsCameraBtn) {
         let pressTimer = null;
+        let isLongPress = false;
 
         momentsCameraBtn.addEventListener('mousedown', function() {
+            isLongPress = false;
             pressTimer = setTimeout(() => {
-                // 长按：进入文字发布页（当前弹窗实现）
+                isLongPress = true;
+                // 长按：打开发布文字界面
                 publishModal.classList.add('show');
                 publishTextarea.value = '';
                 charCount.textContent = '0';
@@ -635,25 +642,103 @@ function initAIMoments() {
             clearTimeout(pressTimer);
         });
 
-        momentsCameraBtn.addEventListener('click', function() {
-            // 短按：打开发布弹窗
-            publishModal.classList.add('show');
-            publishTextarea.value = '';
-            charCount.textContent = '0';
-            publishSubmitBtn.disabled = true;
+        momentsCameraBtn.addEventListener('click', function(e) {
+            // 短按：打开图片选择窗口
+            if (!isLongPress) {
+                momentImageInput.click();
+            }
         });
+    }
+
+    // 处理图片选择
+    if (momentImageInput) {
+        momentImageInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                // 添加选中的图片到数组
+                selectedImages = [...selectedImages, ...files].slice(0, 9); // 最多9张
+
+                // 显示图片预览并打开发布弹窗
+                renderImagePreviews();
+                publishModal.classList.add('show');
+                publishTextarea.value = '';
+                charCount.textContent = '0';
+                updatePublishButtonState();
+            }
+            // 清空input，允许重复选择相同文件
+            this.value = '';
+        });
+    }
+
+    // 渲染图片预览
+    function renderImagePreviews() {
+        if (selectedImages.length === 0) {
+            publishImagesPreview.style.display = 'none';
+            return;
+        }
+
+        publishImagesPreview.style.display = 'block';
+        previewImagesGrid.innerHTML = '';
+
+        // 渲染已选图片
+        selectedImages.forEach((file, index) => {
+            const item = document.createElement('div');
+            item.className = 'preview-image-item';
+
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = file.name;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'preview-image-remove';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = () => removeImage(index);
+
+            item.appendChild(img);
+            item.appendChild(removeBtn);
+            previewImagesGrid.appendChild(item);
+        });
+
+        // 如果少于9张，显示"添加更多"按钮
+        if (selectedImages.length < 9) {
+            const addMore = document.createElement('div');
+            addMore.className = 'preview-image-item';
+            addMore.innerHTML = '<div class="preview-add-more">+</div>';
+            addMore.onclick = () => momentImageInput.click();
+            previewImagesGrid.appendChild(addMore);
+        }
+    }
+
+    // 移除图片
+    function removeImage(index) {
+        selectedImages.splice(index, 1);
+        renderImagePreviews();
+        updatePublishButtonState();
+    }
+
+    // 更新发布按钮状态
+    function updatePublishButtonState() {
+        const hasText = publishTextarea.value.trim().length > 0;
+        const hasImages = selectedImages.length > 0;
+        publishSubmitBtn.disabled = !hasText && !hasImages;
     }
 
     // 关闭发布弹窗
     if (publishModalClose) {
         publishModalClose.addEventListener('click', function() {
             publishModal.classList.remove('show');
+            // 清空图片
+            selectedImages = [];
+            renderImagePreviews();
         });
     }
 
     if (publishCancelBtn) {
         publishCancelBtn.addEventListener('click', function() {
             publishModal.classList.remove('show');
+            // 清空图片
+            selectedImages = [];
+            renderImagePreviews();
         });
     }
 
@@ -662,7 +747,7 @@ function initAIMoments() {
         publishTextarea.addEventListener('input', function() {
             const length = this.value.length;
             charCount.textContent = length;
-            publishSubmitBtn.disabled = length === 0;
+            updatePublishButtonState();
         });
     }
 

@@ -368,6 +368,10 @@
                 <div class="publish-char-count">
                     <span id="charCount">0</span>/500
                 </div>
+                <!-- 图片预览区域 -->
+                <div class="publish-images-preview" id="publishImagesPreview" style="display: none;">
+                    <div class="preview-images-grid" id="previewImagesGrid"></div>
+                </div>
             </div>
             <div class="publish-extras">
                 <button class="publish-extra-btn" title="添加图片">
@@ -409,6 +413,9 @@
         <div class="image-preview-close" id="imagePreviewClose">✕</div>
         <img src="" alt="" class="image-preview-img" id="imagePreviewImg" />
     </div>
+
+    <!-- 隐藏的图片选择input -->
+    <input type="file" id="momentImageInput" accept="image/*" multiple style="display: none;" />
 
     <!-- 弹幕设置弹窗 -->
     <div class="popup-overlay danmaku-settings-popup" id="danmakuSettingsPopup">
