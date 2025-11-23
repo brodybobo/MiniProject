@@ -553,6 +553,24 @@ function initAIMoments() {
         });
     }
 
+    // 点击外部关闭气泡和评论框（全局监听，只添加一次）
+    document.addEventListener('click', function(e) {
+        // 关闭所有气泡
+        if (!e.target.closest('.moment-more-btn') && !e.target.closest('.moment-action-bubble')) {
+            document.querySelectorAll('.moment-action-bubble.show').forEach(b => {
+                b.classList.remove('show');
+            });
+        }
+
+        // 关闭评论框（如果点击的不是评论框相关元素）
+        if (!e.target.closest('.moment-comment-input') &&
+            !e.target.closest('.bubble-action[data-action="comment"]')) {
+            document.querySelectorAll('.moment-comment-input.show').forEach(input => {
+                input.classList.remove('show');
+            });
+        }
+    });
+
     // 通知按钮
     if (notificationBtn) {
         notificationBtn.addEventListener('click', function() {
@@ -736,6 +754,13 @@ function initAIMoments() {
         const momentsList = document.getElementById('momentsList');
         if (!momentsList) return;
 
+        // 保存当前打开的评论框状态
+        const openCommentInputs = [];
+        document.querySelectorAll('.moment-comment-input.show').forEach(input => {
+            const momentId = input.id.replace('comment-input-', '');
+            openCommentInputs.push(momentId);
+        });
+
         momentsList.innerHTML = moments.map(moment => {
             const isAI = moment.userId && moment.userId.startsWith('ai-');
             const isUser = moment.userId === 'user';
@@ -781,7 +806,12 @@ function initAIMoments() {
                         </div>
                     ` : ''}
                 </div>
-                <div class="moment-content">${moment.content}</div>
+                ${moment.content ? `<div class="moment-content">${moment.content}</div>` : ''}
+                ${moment.images && moment.images.length > 0 ? `
+                    <div class="moment-images moment-images-${moment.images.length}">
+                        ${moment.images.map(img => `<img src="${img}" alt="" class="moment-image" />`).join('')}
+                    </div>
+                ` : ''}
                 <div class="moment-footer">
                     <div class="moment-action-bubble" id="bubble-${moment.id}">
                         <button class="bubble-action ${userLiked ? 'liked' : ''}" data-action="like" data-id="${moment.id}">
@@ -827,6 +857,14 @@ function initAIMoments() {
 
         // 绑定事件
         bindMomentEvents();
+
+        // 恢复打开的评论框状态
+        openCommentInputs.forEach(momentId => {
+            const commentInput = document.getElementById(`comment-input-${momentId}`);
+            if (commentInput) {
+                commentInput.classList.add('show');
+            }
+        });
     }
 
     // 绑定动态事件
@@ -866,13 +904,6 @@ function initAIMoments() {
                 }
 
                 bubble.classList.remove('show');
-            });
-        });
-
-        // 点击外部关闭气泡
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.moment-action-bubble.show').forEach(b => {
-                b.classList.remove('show');
             });
         });
 

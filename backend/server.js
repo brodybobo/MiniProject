@@ -466,9 +466,10 @@ function initializeData() {
         {
             id: momentIdCounter++,
             userId: 'ai-user-1',
-            username: '小智',
+            username: '许妍',
             avatar: '',
             content: '今天的拍摄特别顺利！感谢所有工作人员的辛苦付出~ 😊',
+            images: ['icon/许妍1.png'],
             timestamp: Date.now() - 2 * 60 * 60 * 1000,
             likes: [],
             comments: []
@@ -476,9 +477,10 @@ function initializeData() {
         {
             id: momentIdCounter++,
             userId: 'ai-user-2',
-            username: '思雨',
+            username: '沈皓明',
             avatar: '',
-            content: '刚看完剧本，这个角色的成长弧线设计得真好。',
+            content: '',
+            images: ['icon/沈皓明1.png', 'icon/沈皓明2.png'],
             timestamp: Date.now() - 5 * 60 * 60 * 1000,
             likes: [],
             comments: []
@@ -486,9 +488,10 @@ function initializeData() {
         {
             id: momentIdCounter++,
             userId: 'ai-user-3',
-            username: '阳光',
+            username: '方蕾',
             avatar: '',
             content: '工作再忙，也要记得照顾好自己。',
+            images: ['icon/方蕾1.png'],
             timestamp: Date.now() - 8 * 60 * 60 * 1000,
             likes: [],
             comments: []

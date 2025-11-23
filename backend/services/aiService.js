@@ -47,11 +47,11 @@ class AIService {
         } else {
             console.log(`⚠️  未配置有效的 API Key，将使用模拟回复`);
         }
-        
+
         // AI 角色设定
         this.aiCharacters = {
             'ai-user-1': {
-                name: '徐研',
+                name: '许妍',
                 personality: 'cheerful',
                 systemPrompt: '你是一个活泼开朗的年轻人，喜欢看电视剧，经常用表情符号和感叹号。回复要简短、热情。'
             },

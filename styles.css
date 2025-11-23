@@ -2218,6 +2218,68 @@ body {
     margin-top: 4px;
 }
 
+/* 动态图片 */
+.moment-images {
+    margin-bottom: 12px;
+    display: grid;
+    gap: 4px;
+}
+
+/* 单张图片 */
+.moment-images-1 {
+    grid-template-columns: 1fr;
+}
+
+.moment-images-1 .moment-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+
+/* 两张图片 */
+.moment-images-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.moment-images-2 .moment-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+/* 三张及以上图片 */
+.moment-images-3,
+.moment-images-4,
+.moment-images-5,
+.moment-images-6,
+.moment-images-7,
+.moment-images-8,
+.moment-images-9 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.moment-images-3 .moment-image,
+.moment-images-4 .moment-image,
+.moment-images-5 .moment-image,
+.moment-images-6 .moment-image,
+.moment-images-7 .moment-image,
+.moment-images-8 .moment-image,
+.moment-images-9 .moment-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.moment-image {
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.moment-image:hover {
+    transform: scale(1.02);
+}
+
 .moment-expand-btn:hover {
     text-decoration: underline;
 }
