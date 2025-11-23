@@ -729,15 +729,21 @@ function initAIMoments() {
 
         momentsList.innerHTML = moments.map(moment => {
             const isAI = moment.userId && moment.userId.startsWith('ai-');
+            const isUser = moment.userId === 'user';
             const userLiked = moment.likes && moment.likes.some(like => like.userId === 'user');
             const likesText = moment.likes && moment.likes.length > 0
                 ? moment.likes.map(l => l.username).join('、')
                 : '';
 
+            // 头像HTML
+            const avatarHtml = isUser
+                ? `<img src="icon/头像.png" alt="${moment.username}" class="moment-avatar" />`
+                : `<div class="moment-avatar moment-avatar-placeholder ${isAI ? 'ai-star' : ''}">${moment.username.charAt(0)}</div>`;
+
             return `
             <div class="moment-card" data-id="${moment.id}">
                 <div class="moment-header">
-                    <div class="moment-avatar moment-avatar-placeholder ${isAI ? 'ai-star' : ''}">${moment.username.charAt(0)}</div>
+                    ${avatarHtml}
                     <div class="moment-user-info">
                         <div class="moment-user-row">
                             <span class="moment-username">${moment.username}</span>
@@ -748,7 +754,7 @@ function initAIMoments() {
                             ${isAI ? '<span class="official-badge">⭐ 官方推荐</span>' : ''}
                         </div>
                     </div>
-                    ${moment.userId === 'user' ? `
+                    ${isUser ? `
                         <div class="moment-header-actions">
                             <button class="moment-delete-btn" data-id="${moment.id}" title="删除">🗑️</button>
                         </div>
