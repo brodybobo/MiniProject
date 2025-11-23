@@ -227,8 +227,14 @@ app.delete('/api/moments/:id', (req, res) => {
         const momentId = parseInt(req.params.id);
         const { userId } = req.body;
 
+        console.log('🗑️ 收到删除请求 - momentId:', momentId, '类型:', typeof momentId, 'userId:', userId);
+        console.log('📋 当前moments列表:', moments.map(m => ({ id: m.id, userId: m.userId, username: m.username })));
+
         const momentIndex = moments.findIndex(m => m.id === momentId);
+        console.log('🔍 找到的索引:', momentIndex);
+
         if (momentIndex === -1) {
+            console.log('❌ 动态不存在 - momentId:', momentId);
             return res.status(404).json({
                 success: false,
                 message: '动态不存在'
@@ -236,9 +242,11 @@ app.delete('/api/moments/:id', (req, res) => {
         }
 
         const moment = moments[momentIndex];
+        console.log('📝 找到的动态:', { id: moment.id, userId: moment.userId, username: moment.username });
 
         // 验证权限（只能删除自己的动态）
         if (moment.userId !== userId) {
+            console.log('❌ 无权删除 - moment.userId:', moment.userId, 'request.userId:', userId);
             return res.status(403).json({
                 success: false,
                 message: '无权删除此动态'
@@ -327,12 +335,13 @@ async function triggerAIInteraction(momentId) {
             console.log(`🎲 本次不触发AI互动 (概率: ${process.env.AI_REPLY_PROBABILITY || 0.7})`);
             return;
         }
-        
+
         // 延迟 10-30 秒
         const delay = 10000 + Math.random() * 20000;
-        
+
+
         console.log(`⏰ AI 将在 ${Math.round(delay/1000)} 秒后互动动态 ${momentId}`);
-        
+
         setTimeout(async () => {
             const moment = moments.find(m => m.id === momentId);
             if (!moment) {

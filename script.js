@@ -973,8 +973,9 @@ function initAIMoments() {
     if (deleteConfirmBtn) {
         deleteConfirmBtn.addEventListener('click', async function() {
             if (pendingDeleteMomentId) {
-                hideDeleteConfirm();
-                await deleteMoment(pendingDeleteMomentId);
+                const momentId = pendingDeleteMomentId; // 先保存 ID
+                hideDeleteConfirm(); // 再隐藏对话框(会将 pendingDeleteMomentId 设为 null)
+                await deleteMoment(momentId); // 使用保存的 ID
             }
         });
     }
@@ -1193,8 +1194,10 @@ function initAIMoments() {
 
         // 删除按钮
         document.querySelectorAll('.moment-delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const momentId = this.dataset.id;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const momentId = this.getAttribute('data-id');
+                console.log('🗑️ 删除按钮点击 - ID:', momentId, 'dataset.id:', this.dataset.id, 'element:', this);
                 showDeleteConfirm(momentId);
             });
         });
@@ -1291,6 +1294,7 @@ function initAIMoments() {
     let pendingDeleteMomentId = null;
 
     function showDeleteConfirm(momentId) {
+        console.log('📋 显示删除确认对话框 - ID:', momentId, '类型:', typeof momentId);
         pendingDeleteMomentId = momentId;
         const deleteModal = document.getElementById('deleteConfirmModal');
         deleteModal.classList.add('show');
@@ -1306,43 +1310,29 @@ function initAIMoments() {
     // 执行删除操作
     async function deleteMoment(momentId) {
         try {
-            // 先添加删除动画
-            const momentCard = document.querySelector(`[data-id="${momentId}"]`).closest('.moment-card');
-            if (momentCard) {
-                momentCard.classList.add('deleting');
+            console.log('🗑️ 准备删除动态，ID:', momentId, '类型:', typeof momentId);
+            const response = await fetch(`${API_BASE}/moments/${momentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: 'user' })
+            });
+
+            console.log('📡 删除请求响应状态:', response.status);
+
+            if (response.ok) {
+                // 删除成功后重新加载列表
+                console.log('✅ 删除成功');
+                await loadMoments();
+            } else {
+                const errorData = await response.json();
+                console.error('❌ 删除失败:', errorData);
+                showToast(errorData.message || '删除失败');
             }
-
-            // 延迟发送删除请求，让动画播放
-            setTimeout(async () => {
-                const response = await fetch(`${API_BASE}/moments/${momentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userId: 'user' })
-                });
-
-                if (response.ok) {
-                    // 删除成功后重新加载列表
-                    await loadMoments();
-                    showToast('删除成功');
-                } else {
-                    // 删除失败，移除动画类
-                    if (momentCard) {
-                        momentCard.classList.remove('deleting');
-                    }
-                    showToast('删除失败');
-                }
-            }, 150); // 等待一半动画时间再发送请求
-
         } catch (error) {
-            console.error('❌ 删除失败:', error);
+            console.error('❌ 删除失败(网络错误):', error);
             showToast('删除失败，请检查网络连接');
-            // 移除动画类
-            const momentCard = document.querySelector(`[data-id="${momentId}"]`).closest('.moment-card');
-            if (momentCard) {
-                momentCard.classList.remove('deleting');
-            }
         }
     }
 
