@@ -1756,6 +1756,181 @@ body {
     color: var(--ai-title-text);
 }
 
+/* 通知面板 */
+.notifications-panel {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 10;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-panel.show {
+    left: 0;
+}
+
+.notifications-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.notifications-back-btn {
+    background: none;
+    border: none;
+    color: var(--ai-icon-default);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 4px 12px 4px 0;
+    margin-right: 8px;
+    transition: all 0.2s;
+}
+
+.notifications-back-btn:hover {
+    color: var(--ai-primary);
+}
+
+.notifications-header h3 {
+    color: var(--ai-title-text);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+}
+
+.notifications-more-btn {
+    background: none;
+    border: none;
+    color: var(--ai-icon-default);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.notifications-more-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notifications-list {
+    flex: 1;
+    overflow-y: auto;
+    background-color: var(--ai-bg);
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.notification-item:hover {
+    background-color: rgba(93, 95, 239, 0.03);
+}
+
+.notification-item.unread {
+    background-color: rgba(93, 95, 239, 0.05);
+}
+
+.notification-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--ai-primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-user {
+    color: var(--ai-title-text);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.notification-action {
+    color: var(--ai-body-text);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+}
+
+.notification-action .highlight {
+    color: var(--ai-primary);
+}
+
+.notification-time {
+    color: var(--ai-secondary-text);
+    font-size: 12px;
+}
+
+.notification-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: var(--ai-bg);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--ai-body-text);
+}
+
+.notification-thumbnail {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.notification-badge {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--ai-like-highlight);
+    flex-shrink: 0;
+}
+
+.notification-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--ai-secondary-text);
+    font-size: 14px;
+}
+
+.notification-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
 /* 发布入口卡片 */
 .moments-publish-area {
     padding: 12px 16px;

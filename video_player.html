@@ -319,13 +319,25 @@
                 <h2>AI朋友圈</h2>
             </div>
             <div class="moments-header-actions">
-                <button class="moments-header-btn" title="通知">🔔</button>
+                <button class="moments-header-btn" id="notificationBtn" title="通知">🔔</button>
                 <button class="moments-header-btn" id="momentsRefreshBtn" title="刷新">🔄</button>
                 <button class="moments-header-btn camera-btn" id="momentsCameraBtn" title="发布">📷</button>
             </div>
         </div>
 
-        <div class="moments-publish-area">
+        <!-- 通知面板 -->
+        <div class="notifications-panel" id="notificationsPanel">
+            <div class="notifications-header">
+                <button class="notifications-back-btn" id="notificationsBackBtn">‹</button>
+                <h3>全部互动消息</h3>
+                <button class="notifications-more-btn">⋯</button>
+            </div>
+            <div class="notifications-list" id="notificationsList">
+                <!-- 通知列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="moments-publish-area" id="publishArea">
             <div class="moments-publish-card" id="publishCardTrigger">
                 <div class="publish-card-avatar">我</div>
                 <div class="publish-card-input">这一刻的想法…</div>

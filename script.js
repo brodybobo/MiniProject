@@ -523,6 +523,9 @@ function initAIMoments() {
     const publishCardTrigger = document.getElementById('publishCardTrigger');
     const momentsRefreshBtn = document.getElementById('momentsRefreshBtn');
     const momentsCameraBtn = document.getElementById('momentsCameraBtn');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationsPanel = document.getElementById('notificationsPanel');
+    const notificationsBackBtn = document.getElementById('notificationsBackBtn');
     const publishModal = document.getElementById('publishModal');
     const publishModalClose = document.getElementById('publishModalClose');
     const publishCancelBtn = document.getElementById('publishCancelBtn');
@@ -549,6 +552,21 @@ function initAIMoments() {
         momentsCloseBtn.addEventListener('click', function() {
             aiMomentsSidebar.classList.remove('show');
             stopAutoRefresh();
+        });
+    }
+
+    // 通知按钮
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function() {
+            notificationsPanel.classList.add('show');
+            loadNotifications();
+        });
+    }
+
+    // 通知返回按钮
+    if (notificationsBackBtn) {
+        notificationsBackBtn.addEventListener('click', function() {
+            notificationsPanel.classList.remove('show');
         });
     }
 
@@ -927,6 +945,144 @@ function initAIMoments() {
 
         const date = new Date(timestamp);
         return `${date.getMonth() + 1}-${date.getDate()}`;
+    }
+
+    // 加载通知列表
+    async function loadNotifications() {
+        try {
+            // 从moments数据中生成通知
+            const notifications = [];
+
+            // 遍历所有动态，找出用户发布的动态
+            moments.forEach(moment => {
+                if (moment.userId === 'user') {
+                    // 检查点赞通知
+                    if (moment.likes && moment.likes.length > 0) {
+                        moment.likes.forEach(like => {
+                            if (like.userId !== 'user') {
+                                notifications.push({
+                                    id: `like-${moment.id}-${like.userId}`,
+                                    type: 'like',
+                                    user: like.username,
+                                    userId: like.userId,
+                                    action: '赞了你',
+                                    momentContent: moment.content,
+                                    timestamp: like.timestamp || moment.timestamp,
+                                    momentId: moment.id
+                                });
+                            }
+                        });
+                    }
+
+                    // 检查评论通知
+                    if (moment.comments && moment.comments.length > 0) {
+                        moment.comments.forEach(comment => {
+                            if (comment.userId !== 'user') {
+                                notifications.push({
+                                    id: `comment-${moment.id}-${comment.userId}-${comment.timestamp}`,
+                                    type: 'comment',
+                                    user: comment.username,
+                                    userId: comment.userId,
+                                    action: `评论了你: ${comment.content}`,
+                                    momentContent: moment.content,
+                                    timestamp: comment.timestamp || moment.timestamp,
+                                    momentId: moment.id
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // 检查对用户评论的回复
+                if (moment.comments && moment.comments.length > 0) {
+                    moment.comments.forEach(comment => {
+                        if (comment.replyTo === '我' && comment.userId !== 'user') {
+                            notifications.push({
+                                id: `reply-${moment.id}-${comment.userId}-${comment.timestamp}`,
+                                type: 'reply',
+                                user: comment.username,
+                                userId: comment.userId,
+                                action: `回复了你: ${comment.content}`,
+                                momentContent: moment.content,
+                                timestamp: comment.timestamp || moment.timestamp,
+                                momentId: moment.id
+                            });
+                        }
+                    });
+                }
+            });
+
+            // 按时间倒序排序
+            notifications.sort((a, b) => b.timestamp - a.timestamp);
+
+            renderNotifications(notifications);
+        } catch (error) {
+            console.error('❌ 加载通知失败:', error);
+        }
+    }
+
+    // 渲染通知列表
+    function renderNotifications(notifications) {
+        const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) return;
+
+        if (notifications.length === 0) {
+            notificationsList.innerHTML = `
+                <div class="notification-empty">
+                    <div class="notification-empty-icon">🔔</div>
+                    <div>暂无互动消息</div>
+                </div>
+            `;
+            return;
+        }
+
+        notificationsList.innerHTML = notifications.map(notif => {
+            const isAI = notif.userId && notif.userId.startsWith('ai-');
+            const actionText = notif.type === 'like' ? '赞了你' :
+                              notif.type === 'comment' ? '评论了你' :
+                              '回复了你';
+
+            return `
+                <div class="notification-item" data-moment-id="${notif.momentId}">
+                    <div class="notification-avatar">${notif.user.charAt(0)}</div>
+                    <div class="notification-content">
+                        <div class="notification-user">${notif.user}</div>
+                        <div class="notification-action">
+                            ${notif.type === 'like' ? actionText :
+                              `<span class="highlight">${actionText}</span> ${notif.action.includes(':') ? notif.action.split(':')[1].trim() : ''}`}
+                        </div>
+                        <div class="notification-time">${formatTime(notif.timestamp)}</div>
+                        ${notif.momentContent ? `
+                            <div class="notification-preview">
+                                ${notif.momentContent.substring(0, 50)}${notif.momentContent.length > 50 ? '...' : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${notif.thumbnail ? `<img src="${notif.thumbnail}" class="notification-thumbnail" />` : ''}
+                </div>
+            `;
+        }).join('');
+
+        // 绑定通知点击事件
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const momentId = this.dataset.momentId;
+                // 关闭通知面板，回到动态列表
+                notificationsPanel.classList.remove('show');
+                // 滚动到对应的动态
+                setTimeout(() => {
+                    const momentCard = document.querySelector(`.moment-card[data-id="${momentId}"]`);
+                    if (momentCard) {
+                        momentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // 添加高亮效果
+                        momentCard.style.backgroundColor = 'rgba(93, 95, 239, 0.1)';
+                        setTimeout(() => {
+                            momentCard.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                }, 300);
+            });
+        });
     }
 
     // 开始自动刷新
