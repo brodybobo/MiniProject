@@ -399,6 +399,29 @@
         </div>
     </div>
 
+    <!-- 评论右键菜单 -->
+    <div class="comment-context-menu" id="commentContextMenu">
+        <button class="context-menu-item" id="contextMenuCopy">
+            <span class="context-menu-icon">📋</span>
+            <span>复制</span>
+        </button>
+        <button class="context-menu-item context-menu-delete" id="contextMenuDelete">
+            <span class="context-menu-icon">🗑️</span>
+            <span>删除</span>
+        </button>
+    </div>
+
+    <!-- 删除评论确认对话框 -->
+    <div class="delete-confirm-modal" id="deleteCommentModal">
+        <div class="delete-confirm-content">
+            <div class="delete-confirm-message">确定要删除这条评论吗？</div>
+            <div class="delete-confirm-actions">
+                <button class="delete-cancel-btn" id="deleteCommentCancelBtn">取消</button>
+                <button class="delete-confirm-btn" id="deleteCommentConfirmBtn">删除</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 图片预览模态框 -->
     <div class="image-preview-modal" id="imagePreviewModal">
         <div class="image-preview-close" id="imagePreviewClose">✕</div>

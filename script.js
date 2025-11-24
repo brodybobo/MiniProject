@@ -463,7 +463,11 @@ searchInput.addEventListener('keypress', function(e) {
 // 键盘快捷键
 document.addEventListener('keydown', function(e) {
     // 空格键：播放/暂停
-    if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+    // 排除输入框和AI朋友圈打开的情况
+    const aiMomentsSidebar = document.getElementById('aiMomentsSidebar');
+    const isSidebarOpen = aiMomentsSidebar && aiMomentsSidebar.classList.contains('show');
+
+    if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !isSidebarOpen) {
         e.preventDefault();
         if (player.paused()) {
             player.play();
@@ -568,6 +572,8 @@ function initAIMoments() {
     let selectedImages = []; // 存储选中的图片文件
     let currentLocation = null; // 存储当前位置
     let autoRefreshInterval = null;
+    let replyToUser = null; // 存储当前回复的用户名
+    let replyToMomentId = null; // 存储当前回复所在的动态ID
 
     // 打开AI朋友圈侧边栏
     if (aiMomentsBtn) {
@@ -595,12 +601,21 @@ function initAIMoments() {
             });
         }
 
-        // 关闭评论框（如果点击的不是评论框相关元素）
+        // 关闭评论框（如果点击的不是评论框相关元素和评论区）
         if (!e.target.closest('.moment-comment-input') &&
-            !e.target.closest('.bubble-action[data-action="comment"]')) {
+            !e.target.closest('.bubble-action[data-action="comment"]') &&
+            !e.target.closest('.moment-comment')) {
             document.querySelectorAll('.moment-comment-input.show').forEach(input => {
                 input.classList.remove('show');
+                // 清除回复状态并重置placeholder
+                const inputField = input.querySelector('.comment-input');
+                if (inputField) {
+                    inputField.placeholder = '说点什么...';
+                }
             });
+            // 清除全局回复状态
+            replyToUser = null;
+            replyToMomentId = null;
         }
     });
 
@@ -1121,8 +1136,8 @@ function initAIMoments() {
                 ` : ''}
                 ${moment.comments && moment.comments.length > 0 ? `
                     <div class="moment-comments">
-                        ${moment.comments.map(comment => `
-                            <div class="moment-comment">
+                        ${moment.comments.map((comment, index) => `
+                            <div class="moment-comment" data-moment-id="${moment.id}" data-comment-user="${comment.username}" data-comment-index="${index}" data-comment-user-id="${comment.userId || ''}" data-comment-content="${comment.content.replace(/"/g, '&quot;')}">
                                 <div class="comment-main">
                                     <span class="comment-user">${comment.username}${comment.replyTo ? `<span class="comment-reply-to"> 回复 ${comment.replyTo}</span>` : ''}</span>
                                     <span class="comment-content">${comment.content}</span>
@@ -1262,6 +1277,46 @@ function initAIMoments() {
                 imagePreviewModal.classList.add('show');
             });
         });
+
+        // 评论点击回复
+        document.querySelectorAll('.moment-comment').forEach(comment => {
+            // 移除旧的监听器
+            const newComment = comment.cloneNode(true);
+            comment.replaceWith(newComment);
+
+            newComment.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const momentId = this.dataset.momentId;
+                const commentUser = this.dataset.commentUser;
+
+                // 设置回复状态
+                replyToUser = commentUser;
+                replyToMomentId = momentId;
+
+                // 显示评论输入框并设置placeholder
+                const commentInputBox = document.getElementById(`comment-input-${momentId}`);
+                const input = commentInputBox.querySelector('.comment-input');
+
+                commentInputBox.classList.add('show');
+                input.placeholder = `回复 ${commentUser}...`;
+                input.focus();
+
+                console.log('💬 点击回复评论 - 动态ID:', momentId, '回复用户:', commentUser);
+            });
+
+            // 右键菜单
+            newComment.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const momentId = this.dataset.momentId;
+                const commentIndex = this.dataset.commentIndex;
+                const commentUserId = this.dataset.commentUserId;
+                const commentContent = this.dataset.commentContent;
+
+                showCommentContextMenu(e.clientX, e.clientY, momentId, commentIndex, commentUserId, commentContent);
+            });
+        });
     }
 
     // 切换点赞
@@ -1296,22 +1351,35 @@ function initAIMoments() {
     // 提交评论
     async function submitComment(momentId, content) {
         try {
-            console.log('📝 提交评论到动态', momentId, ':', content);
+            // 构建请求体
+            const requestBody = {
+                userId: 'user',
+                username: '我',
+                content: content
+            };
+
+            // 如果有回复对象，添加replyTo字段
+            if (replyToUser && replyToMomentId === momentId) {
+                requestBody.replyTo = replyToUser;
+                console.log('📝 提交回复到动态', momentId, '回复', replyToUser, ':', content);
+            } else {
+                console.log('📝 提交评论到动态', momentId, ':', content);
+            }
+
             const response = await fetch(`${API_BASE}/moments/${momentId}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    userId: 'user',
-                    username: '我',
-                    content: content
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (response.ok) {
                 console.log('✅ 评论成功');
-                showToast('评论成功！AI将在3-8秒内回复');
+
+                // 清除回复状态
+                clearReplyState(momentId);
+
                 loadMoments();
             } else {
                 console.error('❌ 评论失败，状态码:', response.status);
@@ -1320,6 +1388,168 @@ function initAIMoments() {
         } catch (error) {
             console.error('❌ 评论失败:', error);
             showToast('评论失败，请检查网络连接');
+        }
+    }
+
+    // 清除回复状态
+    function clearReplyState(momentId) {
+        replyToUser = null;
+        replyToMomentId = null;
+
+        // 重置输入框placeholder
+        const commentInputBox = document.getElementById(`comment-input-${momentId}`);
+        if (commentInputBox) {
+            const input = commentInputBox.querySelector('.comment-input');
+            if (input) {
+                input.placeholder = '说点什么...';
+            }
+        }
+    }
+
+    // ==================== 评论右键菜单功能 ====================
+    const commentContextMenu = document.getElementById('commentContextMenu');
+    const contextMenuCopy = document.getElementById('contextMenuCopy');
+    const contextMenuDelete = document.getElementById('contextMenuDelete');
+    const deleteCommentModal = document.getElementById('deleteCommentModal');
+    const deleteCommentCancelBtn = document.getElementById('deleteCommentCancelBtn');
+    const deleteCommentConfirmBtn = document.getElementById('deleteCommentConfirmBtn');
+
+    let pendingDeleteCommentInfo = null; // 存储待删除评论信息
+
+    // 显示评论右键菜单
+    function showCommentContextMenu(x, y, momentId, commentIndex, commentUserId, commentContent) {
+        // 隐藏其他菜单
+        hideCommentContextMenu();
+
+        // 保存当前评论信息
+        commentContextMenu.dataset.momentId = momentId;
+        commentContextMenu.dataset.commentIndex = commentIndex;
+        commentContextMenu.dataset.commentUserId = commentUserId;
+        commentContextMenu.dataset.commentContent = commentContent;
+
+        // 只有用户自己的评论才能删除
+        if (commentUserId === 'user') {
+            contextMenuDelete.style.display = 'flex';
+        } else {
+            contextMenuDelete.style.display = 'none';
+        }
+
+        // 计算菜单位置，确保不超出屏幕
+        const menuWidth = 120;
+        const menuHeight = commentUserId === 'user' ? 88 : 44;
+
+        let posX = x;
+        let posY = y;
+
+        if (x + menuWidth > window.innerWidth) {
+            posX = window.innerWidth - menuWidth - 10;
+        }
+        if (y + menuHeight > window.innerHeight) {
+            posY = window.innerHeight - menuHeight - 10;
+        }
+
+        commentContextMenu.style.left = posX + 'px';
+        commentContextMenu.style.top = posY + 'px';
+        commentContextMenu.classList.add('show');
+
+        console.log('📋 显示评论右键菜单 - momentId:', momentId, 'commentIndex:', commentIndex);
+    }
+
+    // 隐藏评论右键菜单
+    function hideCommentContextMenu() {
+        commentContextMenu.classList.remove('show');
+    }
+
+    // 点击其他地方关闭右键菜单
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.comment-context-menu')) {
+            hideCommentContextMenu();
+        }
+    });
+
+    // 复制评论内容
+    if (contextMenuCopy) {
+        contextMenuCopy.addEventListener('click', function() {
+            const content = commentContextMenu.dataset.commentContent;
+            navigator.clipboard.writeText(content).then(() => {
+                showToast('已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showToast('复制失败');
+            });
+            hideCommentContextMenu();
+        });
+    }
+
+    // 删除评论按钮
+    if (contextMenuDelete) {
+        contextMenuDelete.addEventListener('click', function() {
+            const momentId = commentContextMenu.dataset.momentId;
+            const commentIndex = commentContextMenu.dataset.commentIndex;
+
+            pendingDeleteCommentInfo = { momentId, commentIndex };
+            hideCommentContextMenu();
+
+            // 显示删除确认对话框
+            deleteCommentModal.classList.add('show');
+        });
+    }
+
+    // 取消删除评论
+    if (deleteCommentCancelBtn) {
+        deleteCommentCancelBtn.addEventListener('click', function() {
+            deleteCommentModal.classList.remove('show');
+            pendingDeleteCommentInfo = null;
+        });
+    }
+
+    // 确认删除评论
+    if (deleteCommentConfirmBtn) {
+        deleteCommentConfirmBtn.addEventListener('click', async function() {
+            if (!pendingDeleteCommentInfo) return;
+
+            const { momentId, commentIndex } = pendingDeleteCommentInfo;
+            await deleteComment(momentId, commentIndex);
+
+            deleteCommentModal.classList.remove('show');
+            pendingDeleteCommentInfo = null;
+        });
+    }
+
+    // 点击模态框背景关闭
+    if (deleteCommentModal) {
+        deleteCommentModal.addEventListener('click', function(e) {
+            if (e.target === deleteCommentModal) {
+                deleteCommentModal.classList.remove('show');
+                pendingDeleteCommentInfo = null;
+            }
+        });
+    }
+
+    // 删除评论API调用
+    async function deleteComment(momentId, commentIndex) {
+        try {
+            console.log('🗑️ 准备删除评论 - momentId:', momentId, 'commentIndex:', commentIndex);
+            const response = await fetch(`${API_BASE}/moments/${momentId}/comments/${commentIndex}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: 'user' })
+            });
+
+            if (response.ok) {
+                console.log('✅ 评论删除成功');
+                showToast('评论已删除');
+                await loadMoments();
+            } else {
+                const errorData = await response.json();
+                console.error('❌ 删除评论失败:', errorData);
+                showToast(errorData.message || '删除失败');
+            }
+        } catch (error) {
+            console.error('❌ 删除评论失败:', error);
+            showToast('删除失败，请检查网络连接');
         }
     }
 
@@ -1540,6 +1770,15 @@ function initAIMoments() {
     function startAutoRefresh() {
         if (autoRefreshInterval) return;
         autoRefreshInterval = setInterval(() => {
+            // 如果有评论框打开或正在输入，跳过本次刷新
+            const hasOpenCommentInput = document.querySelector('.moment-comment-input.show');
+            const activeElement = document.activeElement;
+            const isTyping = activeElement && (activeElement.classList.contains('comment-input') || activeElement.tagName === 'TEXTAREA');
+
+            if (hasOpenCommentInput || isTyping) {
+                console.log('⏸️ 跳过自动刷新（用户正在输入）');
+                return;
+            }
             loadMoments();
         }, 5000); // 每5秒刷新一次
     }

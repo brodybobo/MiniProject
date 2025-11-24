@@ -400,7 +400,7 @@ async function triggerAIReply(momentId) {
             console.log(`🎲 本次不触发AI回复 (概率: ${process.env.AI_REPLY_PROBABILITY || 0.7})`);
             return;
         }
-        
+
         // 延迟 3-8 秒
         const delay = 3000 + Math.random() * 5000;
         console.log(`⏰ AI 将在 ${Math.round(delay/1000)} 秒后回复评论`);
@@ -417,35 +417,59 @@ async function triggerAIReply(momentId) {
             let aiCharacterId;
             let selectionReason;
 
-            // 检查动态是否是 AI 发布的
-            const isAIMoment = moment.userId.startsWith('ai-user-');
-            
-            if (isAIMoment) {
-                // 动态是 AI 发布的，优先让该 AI 回复（80% 概率）
-                if (Math.random() < 0.8) {
+            // AI角色名称到ID的映射
+            const aiNameToId = {
+                '许妍': 'ai-user-1',
+                '沈皓明': 'ai-user-2',
+                '方蕾': 'ai-user-3'
+            };
+
+            // 优先级1：如果用户回复了某个AI的评论，让那个AI来回复
+            if (lastComment.replyTo && aiNameToId[lastComment.replyTo]) {
+                aiCharacterId = aiNameToId[lastComment.replyTo];
+                selectionReason = `用户回复了${lastComment.replyTo}，由该AI继续对话`;
+            }
+            // 优先级2：检查动态是否是 AI 发布的
+            else {
+                const isAIMoment = moment.userId.startsWith('ai-user-');
+
+                if (isAIMoment) {
+                    // 动态是 AI 发布的，让该 AI 回复
                     aiCharacterId = moment.userId;
-                    selectionReason = '动态发布者优先回复';
+                    selectionReason = '动态发布者回复';
                 } else {
-                    // 20% 概率让其他 AI 回复（模拟朋友圈互动）
-                    aiCharacterId = aiService.getRandomAICharacter();
-                    selectionReason = '其他AI参与互动';
+                    // 用户自己的动态，查找之前与用户对话的AI
+                    // 从评论历史中找最近一个AI的评论
+                    let lastAIComment = null;
+                    for (let i = moment.comments.length - 2; i >= 0; i--) {
+                        const comment = moment.comments[i];
+                        if (comment.userId && comment.userId.startsWith('ai-user-')) {
+                            lastAIComment = comment;
+                            break;
+                        }
+                    }
+
+                    if (lastAIComment) {
+                        aiCharacterId = lastAIComment.userId;
+                        selectionReason = `继续之前的对话，由${lastAIComment.username}回复`;
+                    } else {
+                        // 没有找到之前的AI评论，随机选择
+                        aiCharacterId = aiService.getRandomAICharacter();
+                        selectionReason = '随机AI回复用户动态';
+                    }
                 }
-            } else {
-                // 用户自己的动态，随机选择 AI 回复
-                aiCharacterId = aiService.getRandomAICharacter();
-                selectionReason = '随机AI回复用户动态';
             }
 
             const aiCharacter = aiService.aiCharacters[aiCharacterId];
-            
+
             if (!aiCharacter) {
                 console.error('❌ 未找到 AI 角色:', aiCharacterId);
                 return;
             }
 
             try {
-                console.log(`🤖 AI ${aiCharacter.name} 正在生成回复...`);
-                
+                console.log(`🤖 AI ${aiCharacter.name} 正在生成回复... (${selectionReason})`);
+
                 // 生成 AI 回复
                 const reply = await aiService.generateReply(lastComment.content, aiCharacterId);
 
