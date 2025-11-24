@@ -805,7 +805,7 @@ function initAIMoments() {
     if (locationSelector) {
         locationSelector.addEventListener('click', async function() {
             if (!navigator.geolocation) {
-                showToast('您的浏览器不支持定位服务');
+                console.log('⚠️ 浏览器不支持定位服务');
                 return;
             }
 
@@ -856,9 +856,9 @@ function initAIMoments() {
                 };
                 locationLabel.textContent = defaultLocation;
 
-                // 只有权限被拒绝时才显示toast，其他情况静默使用默认地址
+                // 只有权限被拒绝时才在控制台记录
                 if (error.code === 1) {
-                    showToast('定位权限被拒绝');
+                    console.log('⚠️ 定位权限被拒绝');
                 }
             }
         });
@@ -963,11 +963,9 @@ function initAIMoments() {
                     locationLabel.textContent = '所在位置';
                 } else {
                     console.error('❌ 发布失败，状态码:', response.status);
-                    showToast('发布失败，请重试');
                 }
             } catch (error) {
                 console.error('❌ 发布失败:', error);
-                showToast('发布失败，请检查网络连接');
             }
         });
     }
@@ -1383,11 +1381,9 @@ function initAIMoments() {
                 loadMoments();
             } else {
                 console.error('❌ 评论失败，状态码:', response.status);
-                showToast('评论失败，请重试');
             }
         } catch (error) {
             console.error('❌ 评论失败:', error);
-            showToast('评论失败，请检查网络连接');
         }
     }
 
@@ -1472,10 +1468,9 @@ function initAIMoments() {
         contextMenuCopy.addEventListener('click', function() {
             const content = commentContextMenu.dataset.commentContent;
             navigator.clipboard.writeText(content).then(() => {
-                showToast('已复制到剪贴板');
+                console.log('✅ 已复制到剪贴板');
             }).catch(err => {
                 console.error('复制失败:', err);
-                showToast('复制失败');
             });
             hideCommentContextMenu();
         });
@@ -1540,16 +1535,13 @@ function initAIMoments() {
 
             if (response.ok) {
                 console.log('✅ 评论删除成功');
-                showToast('评论已删除');
                 await loadMoments();
             } else {
                 const errorData = await response.json();
                 console.error('❌ 删除评论失败:', errorData);
-                showToast(errorData.message || '删除失败');
             }
         } catch (error) {
             console.error('❌ 删除评论失败:', error);
-            showToast('删除失败，请检查网络连接');
         }
     }
 
@@ -1591,11 +1583,9 @@ function initAIMoments() {
             } else {
                 const errorData = await response.json();
                 console.error('❌ 删除失败:', errorData);
-                showToast(errorData.message || '删除失败');
             }
         } catch (error) {
             console.error('❌ 删除失败(网络错误):', error);
-            showToast('删除失败，请检查网络连接');
         }
     }
 
