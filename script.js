@@ -575,12 +575,22 @@ function initAIMoments() {
     let replyToUser = null; // 存储当前回复的用户名
     let replyToMomentId = null; // 存储当前回复所在的动态ID
 
-    // 打开AI朋友圈侧边栏
+    // 切换AI朋友圈侧边栏（打开/关闭）
     if (aiMomentsBtn) {
         aiMomentsBtn.addEventListener('click', function() {
-            aiMomentsSidebar.classList.add('show');
-            loadMoments();
-            startAutoRefresh();
+            // 检查当前状态并切换
+            if (aiMomentsSidebar.classList.contains('show')) {
+                // 当前是打开状态，关闭它
+                aiMomentsSidebar.classList.remove('show');
+                stopAutoRefresh();
+                console.log('AI朋友圈已关闭');
+            } else {
+                // 当前是关闭状态，打开它
+                aiMomentsSidebar.classList.add('show');
+                loadMoments();
+                startAutoRefresh();
+                console.log('AI朋友圈已打开');
+            }
         });
     }
 
