@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化弹窗控制
     initPopupControls();
+
+    // 初始化AI朋友圈
+    initAIMoments();
 });
 
 // 初始化视频播放器
@@ -382,14 +385,6 @@ function hideUploadHint() {
     const uploadHint = document.getElementById('uploadHint');
     if (uploadHint) {
         uploadHint.classList.add('hidden');
-    }
-}
-
-// 显示上传提示
-function showUploadHint() {
-    const uploadHint = document.getElementById('uploadHint');
-    if (uploadHint) {
-        uploadHint.classList.remove('hidden');
     }
 }
 
@@ -1793,73 +1788,6 @@ function initAIMoments() {
 
     console.log('AI朋友圈功能初始化完成');
 }
-
-// 显示Toast提示
-function showToast(message, duration = 3000) {
-    // 移除已存在的Toast
-    const existingToast = document.querySelector('.toast-message');
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    // 创建新的Toast
-    const toast = document.createElement('div');
-    toast.className = 'toast-message';
-    toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #ff6b00;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        z-index: 10001;
-        animation: slideIn 0.3s ease-out;
-    `;
-
-    // 添加动画样式
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(toast);
-
-    // 自动隐藏
-    setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-in forwards';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.remove();
-            }
-        }, 300);
-    }, duration);
-}
-
-// 在页面加载时初始化AI朋友圈
-document.addEventListener('DOMContentLoaded', function() {
-    // 生成集数列表
-    generateEpisodes();
-
-    // 设置文件上传监听
-    setupFileUpload();
-
-    // 初始化弹窗控制
-    initPopupControls();
-    
-    // 初始化AI朋友圈
-    initAIMoments();
-});
 
 // 用户评价翻页功能
 const pagePrev = document.querySelector('.page-prev');
