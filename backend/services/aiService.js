@@ -72,9 +72,11 @@ class AIService {
      * 生成 AI 回复
      * @param {string} momentContent - 用户发布的动态内容
      * @param {string} aiCharacterId - AI 角色 ID
+     * @param {Array} images - 图片数组（可选）
+     * @param {Array} conversationHistory - 对话历史（可选）
      * @returns {Promise<string>} AI 生成的回复
      */
-    async generateReply(momentContent, aiCharacterId) {
+    async generateReply(momentContent, aiCharacterId, images = [], conversationHistory = []) {
         try {
             const character = this.aiCharacters[aiCharacterId];
             if (!character) {
@@ -87,17 +89,29 @@ class AIService {
                 return this.getMockReply(momentContent, character.personality);
             }
 
+            // 检查是否包含海边图片
+            const hasSeaImage = images && images.some(img => img.includes('sea.jpg'));
+            const imageContext = hasSeaImage ? '用户还分享了一张美丽的大海照片，蔚蓝的海水和天空非常迷人。' : '';
+
+            // 构建对话历史文本
+            let historyContext = '';
+            if (conversationHistory.length > 0) {
+                historyContext = '\n\n之前的对话：\n' + conversationHistory.map(msg =>
+                    `${msg.username}: ${msg.content}`
+                ).join('\n');
+            }
+
             // 调用 AI API（支持 OpenAI 和 DeepSeek）
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: [
                     {
                         role: 'system',
-                        content: character.systemPrompt + '\n\n重要：回复必须在30字以内，要自然、口语化。'
+                        content: character.systemPrompt + '\n\n重要：回复必须在30字以内，要自然、口语化。你要根据之前的对话内容保持话题连贯性。'
                     },
                     {
                         role: 'user',
-                        content: `有人在观看《许我耀眼》时发布了这样的动态："${momentContent}"。请作为${character.name}回复这条动态。`
+                        content: `有人在观看《许我耀眼》时发布了这样的动态："${momentContent}"。${imageContext}${historyContext}\n\n请作为${character.name}回复这条动态或最新的评论。`
                     }
                 ],
                 temperature: 0.8,
@@ -151,7 +165,7 @@ class AIService {
      * 判断 AI 是否应该回复（基于概率）
      */
     shouldReply() {
-        const probability = parseFloat(process.env.AI_REPLY_PROBABILITY) || 0.7;
+        const probability = parseFloat(process.env.AI_REPLY_PROBABILITY) || 1;
         return Math.random() < probability;
     }
 
@@ -159,8 +173,8 @@ class AIService {
      * 获取随机延迟时间（模拟真实用户）
      */
     getRandomDelay() {
-        const min = parseInt(process.env.AI_REPLY_DELAY_MIN) || 3000;
-        const max = parseInt(process.env.AI_REPLY_DELAY_MAX) || 8000;
+        const min = parseInt(process.env.AI_REPLY_DELAY_MIN) || 200;
+        const max = parseInt(process.env.AI_REPLY_DELAY_MAX) || 400;
         return Math.floor(Math.random() * (max - min) + min);
     }
 
@@ -170,6 +184,46 @@ class AIService {
     getRandomAICharacter() {
         const aiIds = Object.keys(this.aiCharacters);
         return aiIds[Math.floor(Math.random() * aiIds.length)];
+    }
+
+    /**
+     * 随机选择多个 AI 角色（1-2个）
+     * @param {string} excludeCharacterId - 要排除的角色ID（可选）
+     * @returns {Array<string>} AI角色ID数组
+     */
+    getRandomAICharacters(excludeCharacterId = null) {
+        const aiIds = Object.keys(this.aiCharacters);
+
+        // 过滤掉要排除的角色
+        const availableIds = excludeCharacterId
+            ? aiIds.filter(id => id !== excludeCharacterId)
+            : aiIds;
+
+        // 随机选择1-2个角色
+        const count = Math.floor(Math.random() * 2) + 1; // 1 或 2
+
+        // 打乱数组并取前count个
+        const shuffled = [...availableIds].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, Math.min(count, shuffled.length));
+    }
+
+    /**
+     * 检测内容中是否提及某个AI角色
+     * @param {string} content - 要检测的内容
+     * @returns {string|null} 被提及的AI角色ID，如果没有提及则返回null
+     */
+    getMentionedCharacter(content) {
+        if (!content) return null;
+
+        // 遍历所有AI角色，检查是否被提及
+        for (const [aiId, character] of Object.entries(this.aiCharacters)) {
+            if (content.includes(character.name)) {
+                console.log(`🎯 检测到提及: ${character.name}`);
+                return aiId;
+            }
+        }
+
+        return null;
     }
 }
 

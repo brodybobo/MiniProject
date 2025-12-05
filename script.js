@@ -1,6 +1,6 @@
 // 视频播放器实例
 let player;
-let currentEpisode = 1;
+let currentEpisode = 21;
 const totalEpisodes = 32;
 
 // 初始化页面
@@ -950,6 +950,19 @@ function initAIMoments() {
                     postData.location = currentLocation.address;
                 }
 
+                // 如果有选中的图片，添加图片路径
+                if (selectedImages.length > 0) {
+                    postData.images = selectedImages.map(file => {
+                        // 如果是 sea.jpg，使用 icon/sea.jpg 路径
+                        if (file.name.toLowerCase() === 'sea.jpg') {
+                            return 'icon/sea.jpg';
+                        }
+                        // 其他图片使用 createObjectURL 生成的临时路径
+                        return URL.createObjectURL(file);
+                    });
+                    console.log('📷 包含图片:', postData.images);
+                }
+
                 const response = await fetch(`${API_BASE}/moments`, {
                     method: 'POST',
                     headers: {
@@ -963,6 +976,9 @@ function initAIMoments() {
                     publishModal.classList.remove('show');
                     loadMoments();
 
+                    // 重置图片
+                    selectedImages = [];
+                    renderImagePreviews();
                     // 重置位置
                     currentLocation = null;
                     locationLabel.textContent = '所在位置';

@@ -384,17 +384,15 @@ app.delete('/api/moments/:id/comments/:commentIndex', (req, res) => {
 // 触发 AI 互动（点赞或评论）
 async function triggerAIInteraction(momentId) {
     try {
-        // 检查是否应该回复（基于概率）
+        // AI 将始终回复（概率设置为 1）
         if (!aiService.shouldReply()) {
-            console.log(`🎲 本次不触发AI互动 (概率: ${process.env.AI_REPLY_PROBABILITY || 0.7})`);
+            console.log(`⏭️  AI 未触发互动`);
             return;
         }
 
-        // 延迟 10-30 秒
-        const delay = 10000 + Math.random() * 20000;
-
-
-        console.log(`⏰ AI 将在 ${Math.round(delay/1000)} 秒后互动动态 ${momentId}`);
+        // 使用配置的延迟时间（默认 200-400 毫秒）
+        const initialDelay = aiService.getRandomDelay();
+        console.log(`⏰ AI 将在 ${initialDelay} 毫秒后开始互动动态 ${momentId}`);
 
         setTimeout(async () => {
             const moment = moments.find(m => m.id === momentId);
@@ -403,43 +401,88 @@ async function triggerAIInteraction(momentId) {
                 return;
             }
 
-            // 随机选择 AI 角色
-            const aiCharacterId = aiService.getRandomAICharacter();
-            const aiCharacter = aiService.aiCharacters[aiCharacterId];
+            // 检查动态内容中是否提及某个AI角色
+            const mentionedCharacterId = aiService.getMentionedCharacter(moment.content);
 
-            if (!aiCharacter) {
-                console.error('❌ 未找到 AI 角色:', aiCharacterId);
-                return;
-            }
-
-            // 50% 概率点赞，50% 概率评论
-            if (Math.random() > 0.5) {
-                // AI 点赞
-                if (!moment.likes.some(like => like.userId === aiCharacterId)) {
-                    moment.likes.push({
-                        userId: aiCharacterId,
-                        username: aiCharacter.name,
-                        timestamp: Date.now()
-                    });
-                    console.log(`✅ AI ${aiCharacter.name} 点赞了动态 ${momentId}`);
+            // 选择参与互动的AI角色（1-2个）
+            let aiCharacterIds;
+            if (mentionedCharacterId) {
+                // 如果提及了某个角色，该角色必定参与
+                aiCharacterIds = [mentionedCharacterId];
+                // 50%概率再添加一个其他角色
+                if (Math.random() < 0.5) {
+                    const otherAIs = aiService.getRandomAICharacters(mentionedCharacterId);
+                    if (otherAIs.length > 0) {
+                        aiCharacterIds.push(otherAIs[0]);
+                    }
                 }
+                console.log(`👤 提及了${aiService.aiCharacters[mentionedCharacterId].name}，该角色必定参与${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`);
             } else {
-                // AI 评论
-                try {
-                    console.log(`🤖 AI ${aiCharacter.name} 正在生成评论...`);
-                    const reply = await aiService.generateReply(moment.content, aiCharacterId);
-                    moment.comments.push({
-                        userId: aiCharacterId,
-                        username: aiCharacter.name,
-                        content: reply,
-                        timestamp: Date.now()
-                    });
-                    console.log(`✅ AI ${aiCharacter.name} 评论了动态 ${momentId}: ${reply}`);
-                } catch (error) {
-                    console.error('❌ AI 评论生成失败:', error.message);
+                // 未提及任何角色，随机选择1-2个角色
+                aiCharacterIds = aiService.getRandomAICharacters();
+                console.log(`🎲 随机选择 ${aiCharacterIds.length} 个AI角色参与互动`);
+            }
+
+            // 检查是否包含sea.jpg图片
+            const hasSeaImage = moment.images && moment.images.some(img => img.includes('sea.jpg'));
+            if (hasSeaImage) {
+                console.log(`📷 检测到海边图片，AI将评论而不是点赞`);
+            }
+
+            // 让每个AI角色依次互动，每个角色之间有延迟
+            for (let i = 0; i < aiCharacterIds.length; i++) {
+                const aiCharacterId = aiCharacterIds[i];
+                const aiCharacter = aiService.aiCharacters[aiCharacterId];
+
+                if (!aiCharacter) {
+                    console.error('❌ 未找到 AI 角色:', aiCharacterId);
+                    continue;
+                }
+
+                // 每个角色之间延迟200-600毫秒
+                if (i > 0) {
+                    const betweenDelay = Math.floor(Math.random() * 400) + 200;
+                    await new Promise(resolve => setTimeout(resolve, betweenDelay));
+                }
+
+                // 如果包含sea.jpg图片，一定评论；否则50%概率点赞，50%概率评论
+                const shouldComment = hasSeaImage || Math.random() > 0.5;
+
+                if (!shouldComment) {
+                    // AI 点赞
+                    if (!moment.likes.some(like => like.userId === aiCharacterId)) {
+                        moment.likes.push({
+                            userId: aiCharacterId,
+                            username: aiCharacter.name,
+                            timestamp: Date.now()
+                        });
+                        console.log(`✅ AI ${aiCharacter.name} 点赞了动态 ${momentId}`);
+                    }
+                } else {
+                    // AI 评论
+                    try {
+                        console.log(`🤖 AI ${aiCharacter.name} 正在生成评论...`);
+
+                        // 获取最近的对话历史（最多10条评论，包含所有角色的回复）
+                        const conversationHistory = moment.comments.slice(-10).map(comment => ({
+                            username: comment.username,
+                            content: comment.content
+                        }));
+
+                        const reply = await aiService.generateReply(moment.content, aiCharacterId, moment.images, conversationHistory);
+                        moment.comments.push({
+                            userId: aiCharacterId,
+                            username: aiCharacter.name,
+                            content: reply,
+                            timestamp: Date.now()
+                        });
+                        console.log(`✅ AI ${aiCharacter.name} 评论了动态 ${momentId}: ${reply}`);
+                    } catch (error) {
+                        console.error('❌ AI 评论生成失败:', error.message);
+                    }
                 }
             }
-        }, delay);
+        }, initialDelay);
 
     } catch (error) {
         console.error('❌ 触发 AI 互动失败:', error.message);
@@ -449,15 +492,15 @@ async function triggerAIInteraction(momentId) {
 // 触发 AI 回复评论
 async function triggerAIReply(momentId) {
     try {
-        // 检查是否应该回复（基于概率）
+        // AI 将始终回复（概率设置为 1）
         if (!aiService.shouldReply()) {
-            console.log(`🎲 本次不触发AI回复 (概率: ${process.env.AI_REPLY_PROBABILITY || 0.7})`);
+            console.log(`⏭️  AI 未触发回复`);
             return;
         }
 
-        // 延迟 3-8 秒
-        const delay = 3000 + Math.random() * 5000;
-        console.log(`⏰ AI 将在 ${Math.round(delay/1000)} 秒后回复评论`);
+        // 使用配置的延迟时间（默认 200-400 毫秒）
+        const initialDelay = aiService.getRandomDelay();
+        console.log(`⏰ AI 将在 ${initialDelay} 毫秒后开始回复评论`);
 
         setTimeout(async () => {
             const moment = moments.find(m => m.id === momentId);
@@ -467,10 +510,6 @@ async function triggerAIReply(momentId) {
             const lastComment = moment.comments[moment.comments.length - 1];
             if (!lastComment) return;
 
-            // 智能选择回复的 AI 角色
-            let aiCharacterId;
-            let selectionReason;
-
             // AI角色名称到ID的映射
             const aiNameToId = {
                 '许妍': 'ai-user-1',
@@ -478,10 +517,37 @@ async function triggerAIReply(momentId) {
                 '方蕾': 'ai-user-3'
             };
 
+            // 智能选择回复的 AI 角色（1-2个）
+            let aiCharacterIds = [];
+            let selectionReason;
+
+            // 优先级0：检查评论内容中是否提及某个AI角色
+            const mentionedCharacterId = aiService.getMentionedCharacter(lastComment.content);
+            if (mentionedCharacterId) {
+                // 被提及的角色必定参与
+                aiCharacterIds = [mentionedCharacterId];
+                // 30%概率再添加一个其他角色
+                if (Math.random() < 0.3) {
+                    const otherAIs = aiService.getRandomAICharacters(mentionedCharacterId);
+                    if (otherAIs.length > 0) {
+                        aiCharacterIds.push(otherAIs[0]);
+                    }
+                }
+                selectionReason = `用户在评论中提及了${aiService.aiCharacters[mentionedCharacterId].name}${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`;
+            }
             // 优先级1：如果用户回复了某个AI的评论，让那个AI来回复
-            if (lastComment.replyTo && aiNameToId[lastComment.replyTo]) {
-                aiCharacterId = aiNameToId[lastComment.replyTo];
-                selectionReason = `用户回复了${lastComment.replyTo}，由该AI继续对话`;
+            else if (lastComment.replyTo && aiNameToId[lastComment.replyTo]) {
+                const repliedAIId = aiNameToId[lastComment.replyTo];
+                // 被回复的AI一定会回复
+                aiCharacterIds = [repliedAIId];
+                // 30%概率再添加一个其他角色
+                if (Math.random() < 0.3) {
+                    const otherAIs = aiService.getRandomAICharacters(repliedAIId);
+                    if (otherAIs.length > 0) {
+                        aiCharacterIds.push(otherAIs[0]);
+                    }
+                }
+                selectionReason = `用户回复了${lastComment.replyTo}，由该AI继续对话${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`;
             }
             // 优先级2：检查动态是否是 AI 发布的
             else {
@@ -489,11 +555,10 @@ async function triggerAIReply(momentId) {
 
                 if (isAIMoment) {
                     // 动态是 AI 发布的，让该 AI 回复
-                    aiCharacterId = moment.userId;
+                    aiCharacterIds = [moment.userId];
                     selectionReason = '动态发布者回复';
                 } else {
                     // 用户自己的动态，查找之前与用户对话的AI
-                    // 从评论历史中找最近一个AI的评论
                     let lastAIComment = null;
                     for (let i = moment.comments.length - 2; i >= 0; i--) {
                         const comment = moment.comments[i];
@@ -504,43 +569,68 @@ async function triggerAIReply(momentId) {
                     }
 
                     if (lastAIComment) {
-                        aiCharacterId = lastAIComment.userId;
-                        selectionReason = `继续之前的对话，由${lastAIComment.username}回复`;
+                        aiCharacterIds = [lastAIComment.userId];
+                        // 30%概率有其他AI也参与
+                        if (Math.random() < 0.3) {
+                            const otherAIs = aiService.getRandomAICharacters(lastAIComment.userId);
+                            if (otherAIs.length > 0) {
+                                aiCharacterIds.push(otherAIs[0]);
+                            }
+                        }
+                        selectionReason = `继续之前的对话，由${lastAIComment.username}回复${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`;
                     } else {
-                        // 没有找到之前的AI评论，随机选择
-                        aiCharacterId = aiService.getRandomAICharacter();
-                        selectionReason = '随机AI回复用户动态';
+                        // 没有找到之前的AI评论，随机选择1-2个AI
+                        aiCharacterIds = aiService.getRandomAICharacters();
+                        selectionReason = `随机${aiCharacterIds.length}个AI回复用户评论`;
                     }
                 }
             }
 
-            const aiCharacter = aiService.aiCharacters[aiCharacterId];
+            console.log(`🎲 ${selectionReason}，共${aiCharacterIds.length}个AI将回复`);
 
-            if (!aiCharacter) {
-                console.error('❌ 未找到 AI 角色:', aiCharacterId);
-                return;
+            // 让每个AI角色依次回复
+            for (let i = 0; i < aiCharacterIds.length; i++) {
+                const aiCharacterId = aiCharacterIds[i];
+                const aiCharacter = aiService.aiCharacters[aiCharacterId];
+
+                if (!aiCharacter) {
+                    console.error('❌ 未找到 AI 角色:', aiCharacterId);
+                    continue;
+                }
+
+                // 每个角色之间延迟200-600毫秒
+                if (i > 0) {
+                    const betweenDelay = Math.floor(Math.random() * 400) + 200;
+                    await new Promise(resolve => setTimeout(resolve, betweenDelay));
+                }
+
+                try {
+                    console.log(`🤖 AI ${aiCharacter.name} 正在生成回复... (${selectionReason})`);
+
+                    // 获取最近的对话历史（最多10条评论，包含所有角色的回复）
+                    const conversationHistory = moment.comments.slice(-10).map(comment => ({
+                        username: comment.username,
+                        content: comment.content
+                    }));
+
+                    // 生成 AI 回复，传入动态的图片信息和对话历史
+                    const reply = await aiService.generateReply(lastComment.content, aiCharacterId, moment.images, conversationHistory);
+
+                    // 添加 AI 回复
+                    moment.comments.push({
+                        userId: aiCharacterId,
+                        username: aiCharacter.name,
+                        content: reply,
+                        replyTo: lastComment.username,
+                        timestamp: Date.now()
+                    });
+
+                    console.log(`✅ AI ${aiCharacter.name} 回复了评论: ${reply}`);
+                } catch (error) {
+                    console.error('❌ AI 回复生成失败:', error.message);
+                }
             }
-
-            try {
-                console.log(`🤖 AI ${aiCharacter.name} 正在生成回复... (${selectionReason})`);
-
-                // 生成 AI 回复
-                const reply = await aiService.generateReply(lastComment.content, aiCharacterId);
-
-                // 添加 AI 回复
-                moment.comments.push({
-                    userId: aiCharacterId,
-                    username: aiCharacter.name,
-                    content: reply,
-                    replyTo: lastComment.username,
-                    timestamp: Date.now()
-                });
-
-                console.log(`✅ AI ${aiCharacter.name} 回复了评论: ${reply}`);
-            } catch (error) {
-                console.error('❌ AI 回复生成失败:', error.message);
-            }
-        }, delay);
+        }, initialDelay);
 
     } catch (error) {
         console.error('❌ 触发 AI 回复失败:', error.message);
