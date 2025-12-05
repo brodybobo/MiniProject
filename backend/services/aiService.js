@@ -208,22 +208,23 @@ class AIService {
     }
 
     /**
-     * 检测内容中是否提及某个AI角色
+     * 检测内容中是否提及AI角色（支持多角色匹配）
      * @param {string} content - 要检测的内容
-     * @returns {string|null} 被提及的AI角色ID，如果没有提及则返回null
+     * @returns {Array<string>} 被提及的AI角色ID数组，如果没有提及则返回空数组
      */
-    getMentionedCharacter(content) {
-        if (!content) return null;
+    getMentionedCharacters(content) {
+        if (!content) return [];
 
+        const mentionedIds = [];
         // 遍历所有AI角色，检查是否被提及
         for (const [aiId, character] of Object.entries(this.aiCharacters)) {
             if (content.includes(character.name)) {
                 console.log(`🎯 检测到提及: ${character.name}`);
-                return aiId;
+                mentionedIds.push(aiId);
             }
         }
 
-        return null;
+        return mentionedIds;
     }
 }
 

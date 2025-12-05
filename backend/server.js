@@ -401,22 +401,16 @@ async function triggerAIInteraction(momentId) {
                 return;
             }
 
-            // 检查动态内容中是否提及某个AI角色
-            const mentionedCharacterId = aiService.getMentionedCharacter(moment.content);
+            // 检查动态内容中是否提及AI角色（支持多角色匹配）
+            const mentionedCharacterIds = aiService.getMentionedCharacters(moment.content);
 
-            // 选择参与互动的AI角色（1-2个）
+            // 选择参与互动的AI角色
             let aiCharacterIds;
-            if (mentionedCharacterId) {
-                // 如果提及了某个角色，该角色必定参与
-                aiCharacterIds = [mentionedCharacterId];
-                // 50%概率再添加一个其他角色
-                if (Math.random() < 0.5) {
-                    const otherAIs = aiService.getRandomAICharacters(mentionedCharacterId);
-                    if (otherAIs.length > 0) {
-                        aiCharacterIds.push(otherAIs[0]);
-                    }
-                }
-                console.log(`👤 提及了${aiService.aiCharacters[mentionedCharacterId].name}，该角色必定参与${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`);
+            if (mentionedCharacterIds.length > 0) {
+                // 所有被提及的角色都参与
+                aiCharacterIds = [...mentionedCharacterIds];
+                const mentionedNames = mentionedCharacterIds.map(id => aiService.aiCharacters[id].name).join('、');
+                console.log(`👤 提及了${mentionedNames}，共${aiCharacterIds.length}个角色必定参与`);
             } else {
                 // 未提及任何角色，随机选择1-2个角色
                 aiCharacterIds = aiService.getRandomAICharacters();
@@ -445,8 +439,9 @@ async function triggerAIInteraction(momentId) {
                     await new Promise(resolve => setTimeout(resolve, betweenDelay));
                 }
 
-                // 如果包含sea.jpg图片，一定评论；否则50%概率点赞，50%概率评论
-                const shouldComment = hasSeaImage || Math.random() > 0.5;
+                // 如果包含sea.jpg图片或被用户提及，一定评论；否则50%概率点赞，50%概率评论
+                const isMentioned = mentionedCharacterIds.includes(aiCharacterId);
+                const shouldComment = hasSeaImage || isMentioned || Math.random() > 0.5;
 
                 if (!shouldComment) {
                     // AI 点赞
@@ -521,19 +516,13 @@ async function triggerAIReply(momentId) {
             let aiCharacterIds = [];
             let selectionReason;
 
-            // 优先级0：检查评论内容中是否提及某个AI角色
-            const mentionedCharacterId = aiService.getMentionedCharacter(lastComment.content);
-            if (mentionedCharacterId) {
-                // 被提及的角色必定参与
-                aiCharacterIds = [mentionedCharacterId];
-                // 30%概率再添加一个其他角色
-                if (Math.random() < 0.3) {
-                    const otherAIs = aiService.getRandomAICharacters(mentionedCharacterId);
-                    if (otherAIs.length > 0) {
-                        aiCharacterIds.push(otherAIs[0]);
-                    }
-                }
-                selectionReason = `用户在评论中提及了${aiService.aiCharacters[mentionedCharacterId].name}${aiCharacterIds.length > 1 ? '，另有1个AI参与' : ''}`;
+            // 优先级0：检查评论内容中是否提及AI角色（支持多角色匹配）
+            const mentionedCharacterIds = aiService.getMentionedCharacters(lastComment.content);
+            if (mentionedCharacterIds.length > 0) {
+                // 所有被提及的角色都参与
+                aiCharacterIds = [...mentionedCharacterIds];
+                const mentionedNames = mentionedCharacterIds.map(id => aiService.aiCharacters[id].name).join('、');
+                selectionReason = `用户在评论中提及了${mentionedNames}，共${aiCharacterIds.length}个角色参与`;
             }
             // 优先级1：如果用户回复了某个AI的评论，让那个AI来回复
             else if (lastComment.replyTo && aiNameToId[lastComment.replyTo]) {
